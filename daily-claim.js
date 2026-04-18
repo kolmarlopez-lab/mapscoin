@@ -296,6 +296,9 @@
 
     function applyClaimedFromClick() {
       if (cell.getAttribute("data-claimed") === "true") return;
+      if (typeof window.gameHapticClaim === "function") {
+        window.gameHapticClaim();
+      }
       const target = nextLocalMidnight();
       applyCellClaimed();
       addPointsWithAnimation(DAILY_AWARD);

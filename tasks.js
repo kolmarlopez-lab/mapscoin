@@ -414,6 +414,9 @@
   function claim(art, key) {
     if (!art || S[key].s !== "ready") return;
     if (art.getAttribute("data-claiming") === "1") return;
+    if (typeof window.gameHapticClaim === "function") {
+      window.gameHapticClaim();
+    }
     var n;
 
     if (isMultiTask(key)) {
