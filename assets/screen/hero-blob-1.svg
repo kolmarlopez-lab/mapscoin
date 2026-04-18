@@ -1,0 +1,12 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block" viewBox="0 0 453 446" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g id="Ellipse-3" opacity="0.2" filter="url(#hero-blob-1-f)">
+    <ellipse cx="226.5" cy="223" rx="142.5" ry="139" fill="#0091FF"/>
+  </g>
+  <defs>
+    <filter id="hero-blob-1-f" x="0" y="0" width="453" height="446" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+      <feGaussianBlur stdDeviation="42" result="effect1_foregroundBlur_0_110"/>
+    </filter>
+  </defs>
+</svg>

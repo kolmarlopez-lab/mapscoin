@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Геймцентр — задания</title>
+    <link rel="preconnect" href="https://yastatic.net" crossorigin />
+    <link rel="stylesheet" href="fonts.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="game.css" />
+  </head>
+  <body>
+    <div class="game">
+      <div class="game__inner">
+        <header class="game-hero" aria-label="Прогресс за неделю">
+          <!-- 2277:43684 — «лучи» sunburst, под пятнами 2277:43852 -->
+          <div class="game-hero__rays" aria-hidden="true">
+            <img
+              class="game-hero__rays-img"
+              src="assets/screen/hero-rays.svg"
+              alt=""
+              width="380"
+              height="499"
+              decoding="async"
+            />
+          </div>
+          <!-- 2277:43852 — два мягких пятна (SVG из макета), под градиентом свечения -->
+          <div class="game-hero__blob game-hero__blob--1" aria-hidden="true">
+            <div class="game-hero__blob-rot">
+              <div class="game-hero__blob-frame">
+                <img class="game-hero__blob-img" src="assets/screen/hero-blob-1.svg" alt="" width="453" height="446" />
+              </div>
+            </div>
+          </div>
+          <div class="game-hero__blob game-hero__blob--2" aria-hidden="true">
+            <div class="game-hero__blob-rot">
+              <div class="game-hero__blob-frame">
+                <img class="game-hero__blob-img" src="assets/screen/hero-blob-2.svg" alt="" width="453" height="446" />
+              </div>
+            </div>
+          </div>
+          <div class="game-hero__glow" aria-hidden="true"></div>
+          <!-- 2314:16558: YS Text Medium 16/20, глифы 24/24 + Plus 20 (inset 6.25% → 17.5) -->
+          <div class="game-header">
+            <button type="button" class="game-header__ico" aria-label="Справка">
+              <img
+                class="game-header__ico-img"
+                src="assets/screen/header-icon-info.svg"
+                width="24"
+                height="24"
+                alt=""
+                decoding="async"
+              />
+            </button>
+            <div class="game-balance">
+              <div class="game-balance__pill" role="status" aria-label="Баланс баллов">
+                <div class="game-balance__row">
+                  <span class="game-balance__value" id="headerBalanceValue">1800</span>
+                  <div class="game-balance__ico-box" aria-hidden="true">
+                    <img
+                      class="game-balance__ico"
+                      src="assets/screen/balance-plus-glyph.svg"
+                      alt=""
+                      decoding="async"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="game-header__ico" aria-label="Закрыть">
+              <img
+                class="game-header__ico-img"
+                src="assets/screen/header-icon-close.svg"
+                width="24"
+                height="24"
+                alt=""
+                decoding="async"
+              />
+            </button>
+          </div>
+          <div class="game-hero__text">
+            <h1 class="game-hero__h1">
+              Выполняйте
+              <br />
+              задания за баллы
+            </h1>
+            <div class="game-hero__points">
+              <img
+                class="game-hero__pt-ico"
+                src="assets/screen/points-plus.svg"
+                width="36"
+                height="36"
+                alt=""
+                decoding="async"
+              />
+              <span class="game-hero__pt-val" id="headerWeekProgress">0/375</span>
+            </div>
+            <p class="game-hero__sub">заработано на этой неделе</p>
+          </div>
+        </header>
+        <div class="game-sheet">
+          <div class="game-slab">
+            <h2 class="game-slab__h">Баллы за вход</h2>
+            <p class="game-slab__hint" id="dailyStreakHint">0 дней подряд</p>
+          </div>
+          <!-- 2277:43643 + 2282: ряд дней: YS Text Medium, токены text/secondary #878787, margin/gap/пилы по макету -->
+          <div class="daily" role="list" aria-label="Серия дней">
+            <div class="daily__cell daily__cell--lost" role="listitem">
+              <span class="daily__day">1 день</span>
+              <div class="daily__tag">
+                <div class="daily__tag-line">
+                  <span class="daily__tag-val">10</span>
+                  <div class="daily__tag-ico-wrap" aria-hidden="true">
+                    <img class="daily__tag-ico" src="assets/screen/daily-glyph-coin.svg" width="21" height="21" alt="" />
+                  </div>
+                </div>
+              </div>
+              <img
+                class="daily__mark"
+                src="assets/screen/daily-icon-lost.svg"
+                width="14"
+                height="14"
+                alt=""
+                decoding="async"
+              />
+            </div>
+            <div class="daily__cell daily__cell--icondone" role="listitem">
+              <span class="daily__day">2 день</span>
+              <div class="daily__tag">
+                <div class="daily__tag-line">
+                  <span class="daily__tag-val">10</span>
+                  <div class="daily__tag-ico-wrap" aria-hidden="true">
+                    <img class="daily__tag-ico" src="assets/screen/daily-glyph-coin.svg" width="21" height="21" alt="" />
+                  </div>
+                </div>
+              </div>
+              <img
+                class="daily__mark"
+                src="assets/screen/daily-icon-done.svg"
+                width="14"
+                height="14"
+                alt=""
+                decoding="async"
+              />
+            </div>
+            <div class="daily__cell daily__cell--lost" role="listitem">
+              <span class="daily__day">3 день</span>
+              <div class="daily__tag">
+                <div class="daily__tag-line">
+                  <span class="daily__tag-val">10</span>
+                  <div class="daily__tag-ico-wrap" aria-hidden="true">
+                    <img class="daily__tag-ico" src="assets/screen/daily-glyph-coin.svg" width="21" height="21" alt="" />
+                  </div>
+                </div>
+              </div>
+              <img
+                class="daily__mark"
+                src="assets/screen/daily-icon-lost.svg"
+                width="14"
+                height="14"
+                alt=""
+                decoding="async"
+              />
+            </div>
+            <div
+              class="daily__cell daily__cell--today"
+              id="dailyCellToday"
+              role="listitem"
+              data-claimed="false"
+              aria-label="Серия, сегодня"
+            >
+              <span class="daily__day">Сегодня</span>
+              <div class="daily__tag">
+                <div class="daily__tag-line">
+                  <span class="daily__tag-val">10</span>
+                  <div class="daily__tag-ico-wrap" aria-hidden="true">
+                    <img
+                      class="daily__tag-ico"
+                      id="dailyCellTodayGlyph"
+                      src="assets/screen/daily-glyph-coin-today.svg"
+                      width="21"
+                      height="21"
+                      alt=""
+                    />
+                  </div>
+                </div>
+              </div>
+              <img
+                class="daily__mark daily__mark--flame"
+                id="dailyCellTodayMark"
+                src="assets/screen/daily-icon-flame.svg"
+                width="10"
+                height="10"
+                alt=""
+                decoding="async"
+                aria-hidden="true"
+              />
+            </div>
+            <div class="daily__cell daily__cell--iconnext" role="listitem">
+              <span class="daily__day">5 день</span>
+              <div class="daily__tag">
+                <div class="daily__tag-line">
+                  <span class="daily__tag-val">10</span>
+                  <div class="daily__tag-ico-wrap" aria-hidden="true">
+                    <img class="daily__tag-ico" src="assets/screen/daily-glyph-coin.svg" width="21" height="21" alt="" />
+                  </div>
+                </div>
+              </div>
+              <img
+                class="daily__mark"
+                src="assets/screen/daily-icon-next.svg"
+                width="14"
+                height="14"
+                alt=""
+                decoding="async"
+              />
+            </div>
+            <div class="daily__cell daily__cell--iconnext" role="listitem">
+              <span class="daily__day">6 день</span>
+              <div class="daily__tag">
+                <div class="daily__tag-line">
+                  <span class="daily__tag-val">10</span>
+                  <div class="daily__tag-ico-wrap" aria-hidden="true">
+                    <img class="daily__tag-ico" src="assets/screen/daily-glyph-coin.svg" width="21" height="21" alt="" />
+                  </div>
+                </div>
+              </div>
+              <img
+                class="daily__mark"
+                src="assets/screen/daily-icon-next.svg"
+                width="14"
+                height="14"
+                alt=""
+                decoding="async"
+              />
+            </div>
+            <div class="daily__cell daily__cell--iconnext" role="listitem">
+              <span class="daily__day">7 день</span>
+              <div class="daily__tag">
+                <div class="daily__tag-line">
+                  <span class="daily__tag-val">10</span>
+                  <div class="daily__tag-ico-wrap" aria-hidden="true">
+                    <img class="daily__tag-ico" src="assets/screen/daily-glyph-coin.svg" width="21" height="21" alt="" />
+                  </div>
+                </div>
+              </div>
+              <img
+                class="daily__mark"
+                src="assets/screen/daily-icon-next.svg"
+                width="14"
+                height="14"
+                alt=""
+                decoding="async"
+              />
+            </div>
+          </div>
+          <button type="button" class="daily-cta js-award-claim" id="getDailyBtn" data-reward="10">Получить 10 баллов</button>
+          <div class="game-dsep" role="separator" aria-hidden="true">
+            <span class="game-dsep__corner game-dsep__corner--tl"
+              ><img src="assets/screen/game-dsep-corner-tl.svg" width="32" height="32" alt="" decoding="async"
+            /></span>
+            <span class="game-dsep__corner game-dsep__corner--tr"
+              ><img src="assets/screen/game-dsep-corner-tr.svg" width="32" height="32" alt="" decoding="async"
+            /></span>
+            <span class="game-dsep__corner game-dsep__corner--bl"
+              ><img src="assets/screen/game-dsep-corner-bl.svg" width="32" height="32" alt="" decoding="async"
+            /></span>
+            <span class="game-dsep__corner game-dsep__corner--br"
+              ><img src="assets/screen/game-dsep-corner-br.svg" width="32" height="32" alt="" decoding="async"
+            /></span>
+          </div>
+          <section class="weekly" aria-labelledby="weekly-h">
+            <div class="weekly__head">
+              <h2 id="weekly-h" class="weekly__title">Баллы за задания</h2>
+              <p class="weekly__hint">Все задания обновятся через 4 дня</p>
+            </div>
+            <div class="task-tabs">
+              <div class="task-tabs__track" role="tablist" aria-label="Типы заданий">
+                <button type="button" class="task-tabs__tab" role="tab" id="tab-avail" aria-selected="true" aria-controls="task-panel-available" tabindex="0">Можно выполнить</button>
+                <button type="button" class="task-tabs__tab" role="tab" id="tab-finished" aria-selected="false" aria-controls="task-panel-done" tabindex="-1">Выполненные</button>
+              </div>
+            </div>
+            <div class="task-panels">
+              <div class="task-list task-panel" id="task-panel-available" role="tabpanel" aria-labelledby="tab-avail">
+                
+                <article
+                  class="award-card award-card--active award-card--spotlight award-card--task-cursor award-card--task-cursor--active"
+                  data-state="active"
+                  data-task="spotlight"
+                  data-task-title="Выполните все задания на этой неделе"
+                  aria-label="Главное задание недели: все задания выполнены"
+                >
+                  <div class="award-card__top">
+                    <div class="award-card__row award-card__row--tight">
+                      <div class="award-card__icon-wrap" aria-hidden="true">
+                        <div class="award-card__icon-bg">
+                          <div class="award-card__icon-inner">
+                            <img class="award-card__icon-img" src="assets/coffee.png" width="32" height="32" alt="" decoding="async" />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="award-card__list-block">
+                        <p class="award-card__title">Выполните все задания на этой неделе</p>
+                        <button type="button" class="award-card__link" aria-label="Подробнее">
+                          <img class="award-card__chev" src="assets/chevron.svg" width="9" height="16" alt="" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="award-card__progress award-card__progress--quad award-card__progress--spotlight" aria-hidden="true">
+                    <div class="award-card__qseg award-card__qseg--spotlight">
+                      <div class="award-card__dbar award-card__dbar--spotlight js-dbar-early" data-idx="0"></div>
+                    </div>
+                    <div class="award-card__qseg award-card__qseg--spotlight">
+                      <div class="award-card__dbar award-card__dbar--spotlight js-dbar-early" data-idx="1"></div>
+                    </div>
+                    <div class="award-card__qseg award-card__qseg--spotlight">
+                      <div class="award-card__dbar award-card__dbar--spotlight js-dbar-early" data-idx="2"></div>
+                    </div>
+                    <div class="award-card__qseg award-card__qseg--spotlight award-card__qseg--track">
+                      <div class="award-card__dbar award-card__dbar--spotlight">
+                        <div class="award-card__dbar-fill award-card__dbar-fill--quad js-spotbar-last" style="width: 0%"></div>
+                      </div>
+                    </div>
+                    <div class="award-card__tag award-card__tag--on award-card__tag--end award-card__tag--spotlight">
+                      <span class="award-card__tag-val">100</span>
+                      <img
+                        class="award-card__tag-ico"
+                        src="assets/screen/award-coin-glyph-warm.svg"
+                        width="16"
+                        height="16"
+                        alt=""
+                        decoding="async"
+                      />
+                    </div>
+                  </div>
+                  <div class="award-card__footer js-spot-claim-footer" hidden>
+                    <button
+                      type="button"
+                      class="award-card__primary js-award-claim js-task-claim"
+                      data-reward="100"
+                    >
+                      Получить 100 баллов
+                    </button>
+                  </div>
+                </article>
+                <article
+                  class="award-card award-card--active award-card--task-cursor award-card--task-cursor--active"
+                  data-state="active"
+                  data-task="extra1"
+                  data-task-title="Посетите кофейню из подборки «Рядом»"
+                  aria-label="Простое задание: визит в кофейню"
+                >
+                  <div class="award-card__top">
+                    <div class="award-card__row award-card__row--tight">
+                      <div class="award-card__icon-wrap" aria-hidden="true">
+                        <div class="award-card__icon-bg">
+                          <div class="award-card__icon-inner">
+                            <img class="award-card__icon-img" src="assets/coffee.png" width="32" height="32" alt="" />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="award-card__list-block">
+                        <p class="award-card__title">Посетите кофейню из подборки «Рядом»</p>
+                        <button type="button" class="award-card__link" aria-label="Подробнее">
+                          <img class="award-card__chev" src="assets/chevron.svg" width="9" height="16" alt="" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="award-card__progress award-card__progress--bonus" aria-hidden="true">
+                    <div class="award-card__qseg award-card__qseg--track award-card__bonus-qseg">
+                      <div class="award-card__dbar">
+                        <div class="award-card__dbar-fill award-card__dbar-fill--quad js-simple-task-bar-fill" style="width: 0%"></div>
+                      </div>
+                    </div>
+                    <div class="award-card__tag award-card__tag--on award-card__tag--end">
+                      <span class="award-card__tag-val js-extra-tag-val">25</span>
+                      <img
+                        class="award-card__tag-ico"
+                        src="assets/screen/award-coin-glyph-warm.svg"
+                        width="16"
+                        height="16"
+                        alt=""
+                        decoding="async"
+                      />
+                    </div>
+                  </div>
+                  <div class="award-card__footer js-generic-claim-footer" hidden>
+                    <button type="button" class="award-card__primary js-award-claim js-task-claim" data-reward="25">
+                      Получить 25 баллов
+                    </button>
+                  </div>
+                </article>
+                <article
+                  class="award-card award-card--active award-card--task-cursor award-card--task-cursor--active"
+                  data-state="active"
+                  data-task="milestone"
+                  aria-label="Этапы наград"
+                >
+                  <div class="award-card__top">
+                    <div class="award-card__row award-card__row--tight">
+                      <div class="award-card__icon-wrap" aria-hidden="true">
+                        <div class="award-card__icon-bg">
+                          <div class="award-card__icon-inner">
+                            <img class="award-card__icon-img" src="assets/coffee.png" width="32" height="32" alt="" />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="award-card__list-block">
+                        <p class="award-card__title">
+                          Несколько раз в неделю открывайте карточки кофеен — любые точки на карте
+                        </p>
+                        <button type="button" class="award-card__link" aria-label="Подробнее">
+                          <img class="award-card__chev" src="assets/chevron.svg" width="9" height="16" alt="" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="award-card__progress" aria-hidden="true">
+                    <div class="award-card__seg">
+                      <div class="award-card__bar js-mile-bar" data-idx="0"></div>
+                      <div class="award-card__tag award-card__tag--on">
+                        <span class="award-card__tag-val">10</span>
+                        <img
+                          class="award-card__tag-ico"
+                          src="assets/screen/award-coin-glyph-warm.svg"
+                          width="16"
+                          height="16"
+                          alt=""
+                          decoding="async"
+                        />
+                      </div>
+                    </div>
+                    <div class="award-card__seg">
+                      <div class="award-card__bar js-mile-bar" data-idx="1"></div>
+                      <div class="award-card__tag">
+                        <span class="award-card__tag-val">20</span>
+                        <img
+                          class="award-card__tag-ico"
+                          src="assets/screen/award-coin-glyph-muted.svg"
+                          width="16"
+                          height="16"
+                          alt=""
+                          decoding="async"
+                        />
+                      </div>
+                    </div>
+                    <div class="award-card__seg">
+                      <div class="award-card__bar js-mile-bar" data-idx="2"></div>
+                      <div class="award-card__tag">
+                        <span class="award-card__tag-val">30</span>
+                        <img
+                          class="award-card__tag-ico"
+                          src="assets/screen/award-coin-glyph-muted.svg"
+                          width="16"
+                          height="16"
+                          alt=""
+                          decoding="async"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="award-card__footer js-mile-claim-footer" hidden>
+                    <button
+                      type="button"
+                      class="award-card__primary js-award-claim js-task-claim"
+                      data-reward="10"
+                    >
+                      Получить 10 баллов
+                    </button>
+                  </div>
+                </article>
+                <article
+                  class="award-card award-card--active award-card--task-cursor award-card--task-cursor--active"
+                  data-state="active"
+                  data-task="multi1"
+                  data-task-title="Отзывы в течение недели — семь этапов наград"
+                  aria-label="Этапы за отзывы: семь шагов"
+                >
+                  <div class="award-card__top">
+                    <div class="award-card__row award-card__row--tight">
+                      <div class="award-card__icon-wrap" aria-hidden="true">
+                        <div class="award-card__icon-bg">
+                          <div class="award-card__icon-inner">
+                            <img class="award-card__icon-img" src="assets/coffee.png" width="32" height="32" alt="" />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="award-card__list-block">
+                        <p class="award-card__title">Отзывы в течение недели — семь этапов наград</p>
+                        <button type="button" class="award-card__link" aria-label="Подробнее">
+                          <img class="award-card__chev" src="assets/chevron.svg" width="9" height="16" alt="" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="award-card__progress award-card__progress--scroll" aria-hidden="true">
+                    <div class="award-card__seg">
+                      <div class="award-card__bar js-mile-bar" data-idx="0"></div>
+                      <div class="award-card__tag award-card__tag--on">
+                        <span class="award-card__tag-val">10</span>
+                        <img
+                          class="award-card__tag-ico"
+                          src="assets/screen/award-coin-glyph-warm.svg"
+                          width="16"
+                          height="16"
+                          alt=""
+                          decoding="async"
+                        />
+                      </div>
+                    </div>
+                    <div class="award-card__seg">
+                      <div class="award-card__bar js-mile-bar" data-idx="1"></div>
+                      <div class="award-card__tag">
+                        <span class="award-card__tag-val">10</span>
+                        <img
+                          class="award-card__tag-ico"
+                          src="assets/screen/award-coin-glyph-muted.svg"
+                          width="16"
+                          height="16"
+                          alt=""
+                          decoding="async"
+                        />
+                      </div>
+                    </div>
+                    <div class="award-card__seg">
+                      <div class="award-card__bar js-mile-bar" data-idx="2"></div>
+                      <div class="award-card__tag">
+                        <span class="award-card__tag-val">10</span>
+                        <img
+                          class="award-card__tag-ico"
+                          src="assets/screen/award-coin-glyph-muted.svg"
+                          width="16"
+                          height="16"
+                          alt=""
+                          decoding="async"
+                        />
+                      </div>
+                    </div>
+                    <div class="award-card__seg">
+                      <div class="award-card__bar js-mile-bar" data-idx="3"></div>
+                      <div class="award-card__tag">
+                        <span class="award-card__tag-val">10</span>
+                        <img
+                          class="award-card__tag-ico"
+                          src="assets/screen/award-coin-glyph-muted.svg"
+                          width="16"
+                          height="16"
+                          alt=""
+                          decoding="async"
+                        />
+                      </div>
+                    </div>
+                    <div class="award-card__seg">
+                      <div class="award-card__bar js-mile-bar" data-idx="4"></div>
+                      <div class="award-card__tag">
+                        <span class="award-card__tag-val">10</span>
+                        <img
+                          class="award-card__tag-ico"
+                          src="assets/screen/award-coin-glyph-muted.svg"
+                          width="16"
+                          height="16"
+                          alt=""
+                          decoding="async"
+                        />
+                      </div>
+                    </div>
+                    <div class="award-card__seg">
+                      <div class="award-card__bar js-mile-bar" data-idx="5"></div>
+                      <div class="award-card__tag">
+                        <span class="award-card__tag-val">10</span>
+                        <img
+                          class="award-card__tag-ico"
+                          src="assets/screen/award-coin-glyph-muted.svg"
+                          width="16"
+                          height="16"
+                          alt=""
+                          decoding="async"
+                        />
+                      </div>
+                    </div>
+                    <div class="award-card__seg">
+                      <div class="award-card__bar js-mile-bar" data-idx="6"></div>
+                      <div class="award-card__tag">
+                        <span class="award-card__tag-val">20</span>
+                        <img
+                          class="award-card__tag-ico"
+                          src="assets/screen/award-coin-glyph-muted.svg"
+                          width="16"
+                          height="16"
+                          alt=""
+                          decoding="async"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="award-card__footer js-mile-claim-footer" hidden>
+                    <button
+                      type="button"
+                      class="award-card__primary js-award-claim js-task-claim"
+                      data-reward="10"
+                    >
+                      Получить 10 баллов
+                    </button>
+                  </div>
+                </article>
+                <article
+                  class="award-card award-card--active award-card--task-cursor award-card--task-cursor--active"
+                  data-state="active"
+                  data-task="bonus"
+                  data-task-title="Откройте экран «Акции недели»"
+                  aria-label="Простое задание: акции недели"
+                >
+                  <div class="award-card__top">
+                    <div class="award-card__row award-card__row--tight">
+                      <div class="award-card__icon-wrap" aria-hidden="true">
+                        <div class="award-card__icon-bg">
+                          <div class="award-card__icon-inner">
+                            <img class="award-card__icon-img" src="assets/coffee.png" width="32" height="32" alt="" />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="award-card__list-block">
+                        <p class="award-card__title">Откройте экран «Акции недели»</p>
+                        <button type="button" class="award-card__link" aria-label="Подробнее">
+                          <img class="award-card__chev" src="assets/chevron.svg" width="9" height="16" alt="" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="award-card__progress award-card__progress--bonus" aria-hidden="true">
+                    <div class="award-card__qseg award-card__qseg--track award-card__bonus-qseg">
+                      <div class="award-card__dbar">
+                        <div
+                          class="award-card__dbar-fill award-card__dbar-fill--quad js-bonus-bar-fill"
+                          style="width: 0%"
+                        ></div>
+                      </div>
+                    </div>
+                    <div class="award-card__tag award-card__tag--on award-card__tag--end">
+                      <span class="award-card__tag-val">40</span>
+                      <img
+                        class="award-card__tag-ico"
+                        src="assets/screen/award-coin-glyph-warm.svg"
+                        width="16"
+                        height="16"
+                        alt=""
+                        decoding="async"
+                      />
+                    </div>
+                  </div>
+                  <div class="award-card__footer js-bonus-claim-footer" hidden>
+                    <button
+                      type="button"
+                      class="award-card__primary js-award-claim js-task-claim"
+                      data-reward="40"
+                    >
+                      Получить 40 баллов
+                    </button>
+                  </div>
+                </article>
+              
+              </div>
+              <div class="task-list task-panel" id="task-panel-done" role="tabpanel" hidden aria-labelledby="tab-finished">
+                <p class="task-panel-empty js-task-done-empty">Пока нет выполненных наград за эту неделю.</p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+    <script src="coins.js"></script>
+    <script src="tasks.js"></script>
+    <script src="game.js"></script>
+    <script src="daily-claim.js"></script>
+  </body>
+</html>

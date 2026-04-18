@@ -1,0 +1,1165 @@
+/* Экран «штора» 2277:43683, max-w как в макете 375 — вьюпорт фиксирован, скролл внутри */
+.game {
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  background: #0a0c10;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.game__inner {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-width: 375px;
+  width: 100%;
+  margin: 0 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 0 32px;
+  box-sizing: border-box;
+}
+
+/* --- Синий хедер: proportional + lining, явно снимаем tnum (по умолчанию цифры YS с табл. шириной) */
+.game-hero {
+  position: relative;
+  background: #0853f8;
+  /* 2314:16558: верхняя панель с радиусом 20 (как у фрейма Header) */
+  border-radius: 20px 20px 0 0;
+  /* пятна из макета (2277:43852) вылезают вверх — нельзя overflow: hidden */
+  overflow: visible;
+  z-index: 0;
+  padding-bottom: 0;
+  font-family: "YS Text Cond", "YS Text", system-ui, sans-serif;
+  font-variant-numeric: lining-nums proportional-nums;
+  /* tnum 0 — иначе шрифт держит моноширинные (tabular) цифры; pnum 1 + tnum 0 = proportional */
+  font-feature-settings: "tnum" 0, "pnum" 1, "lnum" 1, "onum" 0, "case" 1;
+}
+
+/* С разными весами @font-face WebKit часто сбрасывает ffeat — дублируем на цифрах */
+.game-hero__h1,
+.game-hero__pt-val {
+  font-variant-numeric: lining-nums proportional-nums;
+  font-feature-settings: "tnum" 0, "pnum" 1, "lnum" 1, "onum" 0, "case" 1;
+}
+
+/* Бейдж баланса: YS Text Medium, макет 2314:16558 — 'lnum' 1, 'pnum' 1 (без tnum/case) */
+.game-balance__value {
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+  font-style: normal;
+  color: #fff;
+  font-synthesis: none;
+  font-variant-numeric: lining-nums proportional-nums;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* 2277:43684 — лучи поверх #0853f8, под эллипсами; viewBox 379.6×499 */
+.game-hero__rays {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 100%;
+  min-height: 200px;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.game-hero__rays-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 0;
+  display: block;
+  opacity: 0.99;
+}
+
+/* Figma: два эллипса 278×285, rotate 90° + увеличенный кроп (inset) */
+.game-hero__blob {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  display: flex;
+  width: 278px;
+  height: 285px;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.game-hero__blob--1 {
+  left: calc(50% - 115.5px);
+  top: -49px;
+  transform: translateX(-50%);
+}
+
+.game-hero__blob--2 {
+  left: calc(50% + 0.5px);
+  top: -167px;
+  transform: translateX(-50%);
+}
+
+.game-hero__blob-rot {
+  flex: 0 0 auto;
+  width: 285px;
+  height: 278px;
+  transform: rotate(90deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-hero__blob-frame {
+  position: relative;
+  width: 285px;
+  height: 278px;
+  overflow: visible;
+}
+
+.game-hero__blob-img {
+  position: absolute;
+  display: block;
+  /* как в Figma: растягиваем пятно за кадр 285×278, чтобы вошло тело размытия */
+  inset: -30.22% -29.47% -30.22% -29.47%;
+  object-fit: fill;
+}
+
+.game-hero__glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255, 255, 255, 0.28) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 80% 20%, rgba(0, 150, 255, 0.4) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.game-header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  /* 2314:16558: py 20, px 16 */
+  padding: 20px 16px;
+}
+
+.game-header__ico {
+  width: 24px;
+  height: 24px;
+  display: block;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  line-height: 0;
+  opacity: 0.95;
+  transition: opacity 0.12s ease;
+}
+
+.game-header__ico-img {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+.game-header__ico:hover {
+  opacity: 1;
+}
+
+/* Всплывающий +N при награде (см. daily-claim.js) */
+.game-balance__delta {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  z-index: 3;
+  margin: 0;
+  padding: 0;
+  font-size: 15px;
+  line-height: 18px;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+  pointer-events: none;
+  white-space: nowrap;
+  opacity: 0;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+  font-variant-numeric: lining-nums proportional-nums;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  animation: game-balance-delta-float 1.1s ease-out forwards;
+  transform: translate3d(-50%, 0, 0) scale(0.92);
+}
+
+@keyframes game-balance-delta-float {
+  0% {
+    opacity: 0;
+    transform: translate3d(-50%, 6px, 0) scale(0.9);
+  }
+  12% {
+    opacity: 1;
+    transform: translate3d(-50%, 0, 0) scale(1.04);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-50%, -22px, 0) scale(0.98);
+  }
+}
+
+@keyframes game-balance-pill-bump {
+  0% {
+    transform: scale(1);
+  }
+  32% {
+    transform: scale(1.1);
+  }
+  64% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.game-balance {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+  overflow: visible;
+}
+
+.game-balance__pill {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 100%;
+  padding: 2.5px 3.5px 2.5px 8px;
+  border-radius: 100px;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  background: linear-gradient(
+    90deg,
+    #ff5c4d 0%,
+    #eb469f 40%,
+    #8341ef 100%
+  );
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transform-origin: 50% 50%;
+  transition: box-shadow 0.2s ease;
+}
+
+.game-balance__pill--bump {
+  animation: game-balance-pill-bump 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.5), 0 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.game-balance__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  padding: 1px 0;
+  border-radius: 6px;
+}
+
+.game-balance__ico-box {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Inset 6.25% от 20px → 17.5, как в макете у Source / Glyphs */
+.game-balance__ico {
+  display: block;
+  width: 17.5px;
+  height: 17.5px;
+  flex-shrink: 0;
+}
+
+/* 2277:43857: pt 24; px 8+12 → 16px по краям; pb 56 — к белому листу визуально 32pt при game-sheet margin-top -24px */
+.game-hero__text {
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 375px;
+  margin: 0 auto;
+  padding: 24px 16px 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* 2277:43859: YS Text Cond Bold 36/36 */
+.game-hero__h1 {
+  margin: 0 0 16px;
+  width: 100%;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  color: var(--text-color-bg, #fff);
+  font-family: "YS Text Cond", "YS Text", system-ui, sans-serif;
+  font-size: 36px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 36px;
+  font-synthesis: none;
+  word-break: break-word;
+}
+
+.game-hero__points {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  margin: 0 0 4px;
+}
+
+/* Глиф в макете в кадре 44px с inset 6.25% — на экране читается меньше цифр 44px; 36×36 */
+.game-hero__pt-ico {
+  display: block;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+/* 2277:43865: YS Text Cond Heavy 44, letter-spacing -0.28px, uppercase */
+.game-hero__pt-val {
+  font-size: 44px;
+  line-height: 1;
+  color: var(--text-color-bg, #fff);
+  font-family: "YS Text Cond", "YS Text", system-ui, sans-serif;
+  font-weight: 800;
+  font-style: normal;
+  font-synthesis: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  letter-spacing: -0.28px;
+}
+
+/* 2277:43866: YS Text Medium 16/20 */
+.game-hero__sub {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  color: var(--text-color-bg, #fff);
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-synthesis: none;
+  font-variant-numeric: lining-nums proportional-nums;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+}
+
+/* Белый лист — 2277:43669: pt 8px у фрейма Weekly, затем у list_item заголовка ещё py 8px */
+.game-sheet {
+  position: relative;
+  z-index: 1;
+  margin-top: -24px;
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+  padding: 8px 0 8px;
+  overflow: visible;
+}
+
+.game-sheet h2,
+.game-slab__h {
+  margin: 0;
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: 700;
+  color: #000;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Блок «Баллы за вход» — 2282:13951, контейнер white + px как у ряда дней */
+.game-slab {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  min-height: 56px;
+  padding: 8px 12px;
+  border-bottom: 0;
+  box-sizing: border-box;
+}
+
+.game-slab__hint {
+  margin: 0;
+  font-size: 14px;
+  line-height: 18px;
+  color: #878787;
+  font-weight: 400;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-synthesis: none;
+  font-variant-numeric: lining-nums proportional-nums;
+  font-feature-settings: "lnum" 1, "pnum" 1, "tnum" 0;
+}
+
+/* Daily streak: фиксированная ширина ячеек, горизонтальный скролл (не сжимаем) */
+.daily {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  width: 100%;
+  max-width: 100%;
+  padding: 0 12px 0;
+  box-sizing: border-box;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE / старый Edge */
+}
+
+.daily::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+/* Вся полоса помещается в экран — центрируем ряд; иначе «Сегодня» центрирует daily-claim.js */
+.daily.daily--fits {
+  justify-content: center;
+  overflow-x: hidden;
+}
+
+/* 2277:43643 DailyStreak/Tasks: фикс. карточка 76×96, px-8 py-12, gap-6 */
+.daily__cell {
+  flex: 0 0 76px;
+  width: 76px;
+  min-width: 76px;
+  max-width: 76px;
+  height: 96px;
+  min-height: 96px;
+  max-height: 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 8px;
+  border-radius: 20px;
+  background: #f4f4f4;
+  box-sizing: border-box;
+  scroll-snap-align: start;
+  overflow: hidden;
+}
+
+.daily__cell--today {
+  scroll-snap-align: center;
+  /* 2277:43652 — 3 слоя: linear wash → SVG radial #ff7733 → база #f4f4f4 (как style в Figma) */
+  color: #fff;
+  background-color: #f4f4f4;
+  background-image:
+    linear-gradient(180deg, rgba(255, 119, 51, 0.4) 0%, rgba(255, 246, 0, 0.4) 100%),
+    url("assets/screen/daily-today-mid.svg");
+  background-size: 100% 100%, 100% 100%;
+  background-repeat: no-repeat, no-repeat;
+  background-position: 0 0, 0 0;
+}
+
+.daily__day {
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 500;
+  text-align: center;
+  color: #878787;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-variant-numeric: lining-nums proportional-nums;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+  font-synthesis: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.daily__cell--today .daily__day {
+  color: #fff;
+}
+
+/* «Тег» 2277:43646 / 2277:43654: pl-8 pr-4 py-2; внутри Typography — py-2, gap-2 (как в Figma) */
+.daily__tag {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 100%;
+  border: 1px solid #ebebeb;
+  border-radius: 100px;
+  padding: 2px 4px 2px 8px;
+  background: transparent;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.daily__cell--iconnext .daily__tag {
+  background: #f4f4f4;
+}
+
+.daily__cell--today .daily__tag {
+  background: #fff;
+  border-color: transparent;
+}
+
+.daily__tag-line {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2px;
+  min-width: 0;
+  padding: 2px 0;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.daily__tag-val {
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: 500;
+  color: #878787;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-variant-numeric: lining-nums proportional-nums;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+  font-synthesis: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.daily__cell--today .daily__tag-val {
+  color: #000;
+}
+
+/* Source 24×24, глиф 21×21 ≈ inset 6.25% (2277:43643) */
+.daily__tag-ico-wrap {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.daily__tag-ico {
+  display: block;
+  width: 21px;
+  height: 21px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* Обычные маркеры: 14×14; пламя до клайма — 10×10 */
+.daily__mark {
+  display: block;
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.daily__mark--flame {
+  display: block;
+  width: 10px;
+  height: 10px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* После «Получить 10 баллов» — ячейка «Сегодня» = 2277:43648 (серая + галка) */
+.daily__cell--today.daily__cell--claimed {
+  color: #878787;
+  background: #f4f4f4;
+  background-image: none;
+}
+
+.daily__cell--today.daily__cell--claimed .daily__day {
+  color: #878787;
+}
+
+.daily__cell--today.daily__cell--claimed .daily__tag {
+  background: transparent;
+  border: 1px solid #ebebeb;
+  border-color: #ebebeb;
+}
+
+.daily__cell--today.daily__cell--claimed .daily__tag-val {
+  color: #878787;
+}
+
+.daily-cta {
+  display: block;
+  width: calc(100% - 24px);
+  /* отступ 6px от ряда, как gap у блока 2282:13951 */
+  margin: 6px 12px 12px;
+  border: 0;
+  border-radius: 16px;
+  background: #196dff;
+  color: #fff;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-variant-numeric: lining-nums proportional-nums;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+  font-synthesis: none;
+  padding: 14px 16px;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+  transition: background 0.12s ease, transform 0.1s ease;
+}
+
+.daily-cta:hover {
+  background: #3b7fff;
+}
+
+.daily-cta:active {
+  transform: scale(0.99);
+}
+
+.daily-cta:disabled {
+  cursor: default;
+  opacity: 0.55;
+  background: #196dff;
+  transform: none;
+}
+
+/* 2405:60549 — «Новая награда через H:M:S» (вторичная, после клейма) */
+.daily-cta.daily-cta--countdown:disabled,
+.daily-cta.daily-cta--countdown:disabled:hover {
+  opacity: 1;
+  cursor: default;
+  transform: none;
+  background: #f6f6f6;
+  color: #4d4d4d;
+  box-shadow: none;
+  font-weight: 500;
+}
+
+/* 2405:53922 — Slot / DividerX: полоса #f4f4f4 + углы 32×32 (стык «Баллы за вход» / «Задания») */
+.game-dsep {
+  position: relative;
+  z-index: 1;
+  height: 4px;
+  width: 100%;
+  background: #f4f4f4;
+  margin: 0;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.game-dsep__corner {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  pointer-events: none;
+  line-height: 0;
+}
+
+.game-dsep__corner img {
+  display: block;
+  width: 32px;
+  height: 32px;
+}
+
+.game-dsep__corner--tl {
+  left: 0;
+  top: -32px;
+}
+
+.game-dsep__corner--tr {
+  right: 0;
+  top: -32px;
+}
+
+.game-dsep__corner--bl {
+  left: 0;
+  bottom: -32px;
+}
+
+.game-dsep__corner--br {
+  right: 0;
+  bottom: -32px;
+}
+
+/* Задания: 2405:54379 — pt 8px после разделителя; 2277:43674 — строка заголовка py 8px */
+.weekly {
+  padding-top: 8px;
+}
+
+.weekly__head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 56px;
+  padding: 8px 12px 0;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* 2277:43674: Bold 20/24, подпись Regular 14/18 (перекрываем .game-sheet h2) */
+.game-sheet .weekly .weekly__title,
+.game-sheet h2.weekly__title {
+  margin: 0;
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: 700;
+  color: #000;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-synthesis: none;
+  font-variant-numeric: lining-nums proportional-nums;
+  font-feature-settings: "lnum" 1, "pnum" 1, "tnum" 0;
+}
+
+.weekly__hint {
+  margin: 0;
+  font-size: 14px;
+  line-height: 18px;
+  color: #878787;
+  font-weight: 400;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-synthesis: none;
+  font-variant-numeric: lining-nums proportional-nums;
+  font-feature-settings: "lnum" 1, "pnum" 1, "tnum" 0;
+}
+
+/* 2307: — табы: активная #f6f6f6, пассив — только подпись #878787, gap 4 (не сегмент-контрол) */
+.task-tabs {
+  padding: 4px 12px 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.task-tabs__track {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  margin: 0;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  min-height: 0;
+}
+
+.task-tabs__track .task-tabs__tab {
+  margin: 0;
+  border: 0;
+  border-radius: 1000px;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: 500;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-variant-numeric: lining-nums proportional-nums;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+  font-synthesis: none;
+  color: #878787;
+  background: transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  white-space: nowrap;
+  flex: 0 0 auto;
+  min-height: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.task-tabs__track [role="tab"][aria-selected="true"] {
+  color: #000;
+  background: #f6f6f6;
+}
+
+/* Панели списка — min-height чтобы при уходе карточек в «Выполненные» блок не схлопывался и не дёргал скролл */
+.task-panels {
+  padding: 0 12px 16px;
+  /* несколько карточек заданий + отступы (типовая высота активной карточки ~140–170px) */
+  min-height: min(40rem, 82vh);
+}
+
+.task-panel[hidden] {
+  display: none;
+}
+
+.task-list {
+  --task-card-gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--task-card-gap);
+}
+
+/* Карточки в белом листе — без внешней драматической тени (в макете тень у шитра) */
+.game-sheet .task-list .award-card {
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  box-shadow: none;
+}
+
+/* Figma 2277:43610 — колонка AwardItem: gap 6px между Title+Name, Progress, CTA (внутренний столбец node 2277:43612) */
+#task-panel-available .award-card.award-card--active {
+  gap: 6px;
+}
+
+/* Иначе 6px gap + margin-top у .award-card__progress дают 12px между блоком заголовка и прогрессом */
+#task-panel-available .award-card.award-card--active .award-card__progress {
+  margin-top: 0;
+}
+
+/* Заголовок задания — до 2 строк (14/16), на очень узком шите не уезжает в третью */
+#task-panel-available .award-card__list-block .award-card__title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: break-word;
+}
+
+/* 2407:64428 — Award Item / Compact: тинт, бордер, pad 12, r 20 (Figma node 2407:64428) */
+/* 2407:64428 — главное задание: blue/100 #e7f0ff (не оранжевый тинт) */
+.award-card--active.award-card--spotlight {
+  background: #e7f0ff;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  box-shadow: none;
+  min-height: 0;
+  box-sizing: border-box;
+  flex-direction: column;
+  display: flex;
+}
+
+/* Прогресс: сегменты с зазором 4px; пустой трек rgba(0,0,0,0.1), r 8, h 4 */
+.award-card__progress--spotlight {
+  gap: 4px;
+  align-items: center;
+}
+
+.award-card__qseg--spotlight {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: stretch;
+}
+
+.award-card__dbar--spotlight {
+  width: 100%;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.weekly .award-card__qseg--track .award-card__dbar--spotlight {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.weekly .award-card__dbar--spotlight.is-filled {
+  background: var(--award-cta);
+  opacity: 1;
+}
+
+.award-card__tag--spotlight {
+  padding: 4px 4px 4px 6px;
+  font-size: 14px;
+  line-height: 16px;
+}
+
+/* Плаш + шеврон — единая высота клика (включая главное задание) */
+.weekly #task-panel-available .award-card__list-block .award-card__link {
+  min-height: 20px;
+  min-width: 20px;
+  padding: 0 0 0 4px;
+  align-items: center;
+  align-self: center;
+}
+
+.award-card__tag--end {
+  flex-shrink: 0;
+}
+
+.award-card__progress--quad {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  margin-top: 0;
+  flex-wrap: nowrap;
+}
+
+.award-card__qseg {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.award-card__dbar {
+  width: 100%;
+  height: 4px;
+  border-radius: 8px;
+  background: var(--award-track);
+  min-width: 4px;
+}
+
+/* Доп. награда: одна дорожка + тег 40 (Figma 2309:17031) */
+.award-card__progress--bonus {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  margin-top: 0;
+  flex-wrap: nowrap;
+}
+
+.award-card__bonus-qseg {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Логика заданий: фрагменты + прогресс (tasks.js) */
+/* Figma 2309:17032 — Title+Name и кнопка: gap 6pt + pt 4 у блока с кнопкой */
+.task-fragment--ready {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+
+.task-fragment[hidden] {
+  display: none !important;
+}
+
+.award-card--task-cursor {
+  cursor: default;
+}
+
+.award-card--task-cursor--active {
+  cursor: pointer;
+}
+
+.award-card--task-cursor--active
+  *:is(.award-card__link, .js-task-claim) {
+  cursor: pointer;
+}
+
+.weekly
+  :is(.js-task-claimed .award-card__row, .js-task-claimed .award-card__link) {
+  cursor: default;
+}
+
+.js-task-claim {
+  cursor: pointer;
+}
+
+.task-panel-empty {
+  margin: 0;
+  padding: 16px 8px 12px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 18px;
+  color: #878787;
+  font-weight: 400;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.task-panel-empty[hidden] {
+  display: none;
+}
+
+.weekly .award-card__qseg--track .award-card__dbar {
+  position: relative;
+  width: 100%;
+  min-height: 4px;
+  border-radius: 8px;
+  background: var(--award-track);
+  overflow: hidden;
+}
+
+.weekly .award-card__dbar-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  max-width: 100%;
+  border-radius: 8px;
+  background: var(--award-cta);
+  transition: width 0.2s ease;
+}
+
+.weekly .award-card__qseg--track .award-card__dbar-fill--quad {
+  background: var(--award-cta);
+}
+
+.weekly .award-card__dbar.is-filled {
+  background: var(--award-cta);
+}
+
+/* Кнопка задания: без scaleY (даёт дрожание текста) — только GPU-friendly translate + opacity */
+@keyframes weekly-cta-stretch {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes weekly-cta-collapse {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    max-height: 160px;
+    padding-top: 4px;
+    margin-top: 0;
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+    max-height: 0;
+    padding-top: 0;
+    margin-top: 0;
+  }
+}
+
+.weekly .task-fragment--ready.js-cta-appear-anim .award-card__footer,
+.weekly .js-mile-claim-footer.js-cta-appear-anim,
+.weekly .js-spot-claim-footer.js-cta-appear-anim,
+.weekly .js-bonus-claim-footer.js-cta-appear-anim {
+  overflow: hidden;
+  backface-visibility: hidden;
+  animation: weekly-cta-stretch 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.weekly .js-mile-claim-footer.js-cta-hide-anim,
+.weekly .js-spot-claim-footer.js-cta-hide-anim,
+.weekly .js-bonus-claim-footer.js-cta-hide-anim {
+  overflow: hidden;
+  pointer-events: none;
+  box-sizing: border-box;
+  animation: weekly-cta-collapse 0.42s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Пока кнопка схлопывается — тот же ритм колонки, что в Figma */
+.weekly .award-card.is-claim-footer-hiding {
+  gap: 6px;
+}
+
+/* Блок с кнопкой: pt 4px как у обёртки кнопки в макете (node 4044:27953 / 2309:17038) */
+.weekly .award-card--weekly-claim-step .award-card__footer {
+  margin-top: 0;
+  padding-top: 4px;
+}
+
+#task-panel-available .award-card {
+  transition:
+    max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    padding-top 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    padding-bottom 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    gap 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-width 0.25s ease;
+  transform-origin: center top;
+}
+
+/* Уход в «Выполненные»: затухание + схлопывание высоты — соседние карточки плавно съезжают */
+#task-panel-available .award-card.js-task-leave {
+  opacity: 0;
+  transform: translate3d(0, 6px, 0);
+  min-height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  gap: 0 !important;
+  border-width: 0 !important;
+  pointer-events: none;
+}
+
+/* Средняя карточка: без лишнего «двойного» gap при схлопывании */
+#task-panel-available .award-card.js-task-leave.js-task-leave--squeeze-gap {
+  margin-bottom: calc(-1 * var(--task-card-gap, 8px));
+}
+
+@keyframes weekly-claimed-appear {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+#task-panel-done .award-card.js-claimed-anim {
+  animation: weekly-claimed-appear 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weekly .task-fragment--ready.js-cta-appear-anim .award-card__footer,
+  .weekly .js-mile-claim-footer.js-cta-appear-anim,
+  .weekly .js-spot-claim-footer.js-cta-appear-anim,
+  .weekly .js-bonus-claim-footer.js-cta-appear-anim {
+    animation: none;
+    will-change: auto;
+    transform: none;
+    opacity: 1;
+  }
+  .weekly .js-mile-claim-footer.js-cta-hide-anim,
+  .weekly .js-spot-claim-footer.js-cta-hide-anim,
+  .weekly .js-bonus-claim-footer.js-cta-hide-anim {
+    animation: none;
+    will-change: auto;
+    transform: none;
+    opacity: 0;
+  }
+  #task-panel-available .award-card {
+    transition: none;
+  }
+  #task-panel-available .award-card.js-task-leave {
+    opacity: 0.001;
+    transform: none;
+    max-height: none !important;
+    min-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  #task-panel-done .award-card.js-claimed-anim {
+    animation: none;
+    will-change: auto;
+  }
+}
+
