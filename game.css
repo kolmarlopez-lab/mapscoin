@@ -316,9 +316,11 @@
 
 /* Figma 2402:45799 Tag — белый фон, border separator #ebebeb (Геймцентр) */
 .game-header-new .game-balance__pill.game-header-new__week-pill {
-  border: 1px solid #ebebeb;
-  background: #fff;
-  box-shadow: none;
+  /* !important: иначе в моб. WebKit градиент базового .game-balance__pill может перебивать каскадом */
+  border: 1px solid #ebebeb !important;
+  background-color: #fff !important;
+  background-image: none !important;
+  box-shadow: none !important;
   padding: 4px 4px 4px 6px;
 }
 
@@ -329,7 +331,7 @@
 }
 
 .game-header-new .game-header-new__week-pill .game-balance__value {
-  color: #000;
+  color: #000 !important;
   font-size: 14px;
   line-height: 16px;
   font-weight: 500;

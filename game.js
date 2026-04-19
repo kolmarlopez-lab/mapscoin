@@ -273,8 +273,11 @@
     return Math.max(0, pad - pull);
   }
 
+  /** Показать new header чуть раньше базового порога (px скролла) */
+  var headerNewEarlyPx = 28;
+
   function sync() {
-    var th = frostThreshold();
+    var th = Math.max(0, frostThreshold() - headerNewEarlyPx);
     setScrolled(scrollEl.scrollTop >= th - 0.5);
   }
 
