@@ -27,8 +27,15 @@
   const streakHint = document.getElementById("dailyStreakHint");
   const balanceVal = document.getElementById("headerBalanceValue");
   const weekVal = document.getElementById("headerWeekProgress");
-  const balancePill = document.querySelector(".game-balance__pill");
-  const balanceWrap = document.querySelector(".game-balance");
+  const weekPill = document.querySelector(".game-hero__week-pill");
+
+  function prefersReducedMotion() {
+    try {
+      return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    } catch (e) {
+      return false;
+    }
+  }
 
   try {
     localStorage.removeItem(LEGACY_DAILY_KEY);
@@ -199,41 +206,52 @@
     const weekMax = getWeekMaxPoints();
     const fromW = wParts.earned;
     const toW = Math.min(fromW + n, weekMax);
-    if (balancePill) {
-      balancePill.classList.add("game-balance__pill--bump");
-      window.setTimeout(function () {
-        balancePill.classList.remove("game-balance__pill--bump");
-      }, 900);
+
+    balanceVal.textContent = String(toB);
+    setSavedBalance(toB);
+
+    if (!weekVal) {
+      if (toW !== fromW) setSavedWeekEarned(toW);
+      return;
     }
-    if (balanceWrap) {
-      const delta = document.createElement("span");
-      delta.className = "game-balance__delta";
-      delta.textContent = "+" + n;
-      balanceWrap.appendChild(delta);
-      window.setTimeout(function () {
-        delta.remove();
-      }, 1200);
+    if (fromW === toW) {
+      return;
+    }
+
+    if (weekPill && !prefersReducedMotion()) {
+      weekPill.classList.remove("game-hero__week-pill--bounce");
+      weekPill.classList.add("game-hero__week-pill--grow");
     }
     const t0 = performance.now();
     const DUR = 600;
+    function finishWeekPillBounce() {
+      if (!weekPill || prefersReducedMotion()) return;
+      weekPill.classList.remove("game-hero__week-pill--grow");
+      void weekPill.offsetWidth;
+      weekPill.classList.add("game-hero__week-pill--bounce");
+      function onBounceEnd(ev) {
+        if (ev.target !== weekPill) return;
+        if (ev.animationName !== "game-hero-week-pill-bounce") return;
+        weekPill.classList.remove("game-hero__week-pill--bounce");
+        weekPill.removeEventListener("animationend", onBounceEnd);
+      }
+      weekPill.addEventListener("animationend", onBounceEnd);
+    }
     function step(now) {
       const t = Math.min(1, (now - t0) / DUR);
       const eased = 1 - Math.pow(1 - t, 3);
-      const b = Math.round(fromB + (toB - fromB) * eased);
       const wE = Math.round(fromW + (toW - fromW) * eased);
-      balanceVal.textContent = String(b);
       if (weekVal) {
         weekVal.textContent = String(wE) + "/" + String(weekMax);
       }
       if (t < 1) {
         requestAnimationFrame(step);
       } else {
-        balanceVal.textContent = String(toB);
-        setSavedBalance(toB);
         if (weekVal) {
           weekVal.textContent = String(toW) + "/" + String(weekMax);
           setSavedWeekEarned(toW);
         }
+        finishWeekPillBounce();
       }
     }
     requestAnimationFrame(step);
