@@ -2,6 +2,9 @@
   "use strict";
 
   var audioCtx = null;
+  var claimMoneyAudio = null;
+
+  var CLAIM_SOUND_SRC = "assets/sound/money.mp3";
 
   function prefersReducedMotion() {
     try {
@@ -37,6 +40,32 @@
     return audioCtx;
   }
 
+  function getClaimMoneyAudio() {
+    if (claimMoneyAudio) return claimMoneyAudio;
+    try {
+      claimMoneyAudio = new Audio(CLAIM_SOUND_SRC);
+      claimMoneyAudio.preload = "auto";
+    } catch (e) {
+      void e;
+      return null;
+    }
+    return claimMoneyAudio;
+  }
+
+  /** Звук при нажатии на кнопки «Получить» / начисления баллов */
+  function playClaimMoneySound() {
+    if (prefersReducedMotion()) return;
+    var a = getClaimMoneyAudio();
+    if (!a) return;
+    try {
+      a.currentTime = 0;
+      var p = a.play();
+      if (p && typeof p.catch === "function") p.catch(function () {});
+    } catch (e) {
+      void e;
+    }
+  }
+
   /**
    * Короткий «щелчок» как замена вибрации (Safari не поддерживает navigator.vibrate).
    * Вызывать только из обработчика жеста пользователя — иначе iOS может не запустить звук.
@@ -68,19 +97,6 @@
     }
   }
 
-  function playClaimClicks() {
-    var ctx = getAudioContext();
-    if (!ctx) return;
-    try {
-      if (ctx.state === "suspended") ctx.resume();
-    } catch (e) {
-      void e;
-    }
-    var t0 = ctx.currentTime;
-    playSoftClick(t0);
-    playSoftClick(t0 + 0.062);
-  }
-
   function tryVibrate(pattern) {
     if (typeof navigator === "undefined" || typeof navigator.vibrate !== "function") {
       return false;
@@ -98,12 +114,11 @@
     tryVibrate(pattern);
   }
 
-  /** Двойной короткий импульс при успешном «Получить» */
+  /** Дополнительная вибрация при успешном «Получить» (звук уже на pointerdown) */
   function claim() {
     if (!isMobileHapticContext()) return;
     if (prefersReducedMotion()) return;
-    if (tryVibrate([12, 48, 14])) return;
-    playClaimClicks();
+    tryVibrate([12, 48, 14]);
   }
 
   /** Лёгкий импульс при загрузке (часто срабатывает на Android; iOS Safari может игнорировать без жеста) */
@@ -112,12 +127,19 @@
     vibrate(16);
   }
 
-  /** Короткий отклик при нажатии на кнопку (до срабатывания click) */
+  /** Отклик при нажатии на обычные кнопки (не начисление баллов) */
   function tap() {
     if (!isMobileHapticContext()) return;
     if (prefersReducedMotion()) return;
     if (tryVibrate(10)) return;
     playSoftClick();
+  }
+
+  /** Нажатие на кнопку получения баллов: звук из assets/sound + вибрация на поддерживаемых устройствах */
+  function tapClaimReward() {
+    if (prefersReducedMotion()) return;
+    playClaimMoneySound();
+    if (isMobileHapticContext()) tryVibrate(10);
   }
 
   if (typeof window === "undefined") return;
@@ -132,6 +154,10 @@
       if (e.button !== 0) return;
       var el = e.target && e.target.closest && e.target.closest("button");
       if (!el || el.disabled) return;
+      if (el.classList.contains("js-award-claim")) {
+        tapClaimReward();
+        return;
+      }
       tap();
     },
     { passive: true, capture: true }
