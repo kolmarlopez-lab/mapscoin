@@ -1,4 +1,4 @@
-/* Обёртка экрана: центрирование 375px; высота = окно, иначе блок растёт по контенту и .game__inner не скроллится */
+/* Обёртка экрана: центрирование 375px; колонка flex без вертикального скролла — скролл в .game-scroll */
 .screen-game {
   width: 100%;
   max-width: 375px;
@@ -33,19 +33,65 @@
   max-width: 375px;
   width: 100%;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Герой + скролл: слой скролла на весь .game-main (наезд белого на синий при прокрутке).
+   padding-top: резерв под абсолютную шапку (раньше шапка была отдельным рядом и давала ту же высоту). */
+.game-main {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+  overflow: visible;
+  background: #0853f8;
+  box-sizing: border-box;
+  padding-top: var(--game-header-offset, 64px);
+}
+
+.game-scroll {
+  /* Расстояние от верха .game-main до низа .game-hero (см. game.js), не просто height героя */
+  --game-hero-h: 280px;
+  /* |margin-top| у .game-sheet — порог размытой шапки в game.js; меньше — больше воздуха над листом у подписи героя */
+  --game-sheet-pull: 44px;
+  position: absolute;
+  /* Вверх на высоту шапки: вьюпорт скролла совпадает с зоной под иконками — белый лист может уехать под шапку */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: calc(-1 * var(--game-header-offset, 64px));
+  /* Выше слоя героя: белый лист перекрывает .game-header-basic */
+  z-index: 5;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-  padding: 0 0 32px;
+  /* Прозрачная зона = герой; + offset — расстояние от верха расширенного скролла до низа героя */
+  --game-scroll-pad: calc(var(--game-hero-h) + var(--game-header-offset, 64px));
+  padding-top: var(--game-scroll-pad);
+  padding-bottom: 32px;
+  padding-left: 0;
+  padding-right: 0;
   box-sizing: border-box;
+  /* Ниже зоны героя — белый фон (в т.ч. под padding-bottom), иначе просвечивает синий .game-main */
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent var(--game-scroll-pad),
+    #fff var(--game-scroll-pad)
+  );
+  pointer-events: auto;
 }
 
 /* --- Синий хедер: proportional + lining, явно снимаем tnum (по умолчанию цифры YS с табл. шириной) */
 .game-hero {
   position: relative;
+  flex-shrink: 0;
+  box-sizing: border-box;
   background: #0853f8;
-  /* Шапка вынесена в .game-header — без скругления у шапки */
+  /* Basic header — .game-header-basic внутри героя */
   border-radius: 0;
   margin-top: calc(-1 * var(--game-header-offset, 64px));
   padding-top: var(--game-header-offset, 64px);
@@ -175,52 +221,84 @@
   pointer-events: none;
 }
 
-/* Маркер под шапкой: когда уезжает из вьюпорта скролла — включаем .game-header--scrolled (см. game.js) */
-.game-header-scroll-sentinel {
-  flex-shrink: 0;
-  width: 100%;
-  height: 2px;
-  margin: 0;
-  padding: 0;
-  pointer-events: none;
-  visibility: hidden;
-}
-
-.game-header {
-  /* 4082:30374 — до скролла прозрачная; после — размытие контента под шапкой (frosted glass) */
-  /* Иконки шапки при скролле (поверх blur) */
+/* Basic header: стартовая шапка в слое героя; перекрывается белым листом (.game-scroll выше по z-index) */
+.game-header-basic {
   --icons-secondary: #ccc;
-  position: sticky;
+  position: absolute;
+  left: 0;
+  right: 0;
   top: 0;
-  z-index: 3;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 4;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  /* 2314:16558: py 20, px 16 */
   padding: 20px 16px;
   background: transparent;
-  transition:
-    background-color 0.22s ease,
-    box-shadow 0.22s ease,
-    -webkit-backdrop-filter 0.22s ease,
-    backdrop-filter 0.22s ease;
 }
 
-.game-header--scrolled {
-  /* Полупрозрачная плёнка + blur контента сзади (без сплошного #fff) */
-  background: rgba(255, 255, 255, 0.58);
-  -webkit-backdrop-filter: blur(18px) saturate(1.35);
-  backdrop-filter: blur(18px) saturate(1.35);
+/* New header: белая полоса + те же контролы; только после порога скролла (game.js), над белым листом */
+.game-header-new {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 16;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-100%);
+  transition:
+    transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.28s ease,
+    visibility 0s linear 0.38s;
+}
+
+.game-header-new--visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition:
+    transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.28s ease,
+    visibility 0s linear 0s;
+}
+
+.game-header-new__frost {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: transparent;
+}
+
+.game-header-new--visible .game-header-new__frost {
+  background: #fff;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
 }
 
-@media (prefers-reduced-transparency: reduce) {
-  .game-header--scrolled {
-    background: rgba(255, 255, 255, 0.92);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
+.game-header-new__row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 16px;
+  box-sizing: border-box;
+}
+
+.game-header-basic > .game-header__ico,
+.game-header-basic > .game-balance,
+.game-header-new__row > .game-header__ico,
+.game-header-new__row > .game-balance {
+  position: relative;
+  z-index: 1;
 }
 
 .game-header__ico {
@@ -269,23 +347,27 @@
   transition: opacity 0.22s ease;
 }
 
-.game-header--scrolled .game-header__ico-img--light {
-  opacity: 0;
-}
-
-.game-header--scrolled .game-header__ico-img--dark {
-  opacity: 1;
-}
-
 .game-header__ico:hover {
   opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .game-header,
   .game-header__ico-img--dark,
   .game-header__ico-img--light {
     transition: none;
+  }
+
+  .game-header-new {
+    transition:
+      opacity 0.2s ease,
+      visibility 0s linear 0.2s;
+  }
+
+  .game-header-new--visible {
+    transform: none;
+    transition:
+      opacity 0.2s ease,
+      visibility 0s linear 0s;
   }
 }
 
@@ -498,7 +580,7 @@
 
 /* 2277:43866: YS Text Medium 16/20 */
 .game-hero__sub {
-  margin: 0;
+  margin: 0 0 20px;
   width: 100%;
   text-align: center;
   color: var(--text-color-bg, #fff);
@@ -511,16 +593,24 @@
   font-feature-settings: "lnum" 1, "pnum" 1;
 }
 
-/* Белый лист — pt 8px у фрейма Weekly; скругление 20pt */
+/* Белый лист — pt 8px у фрейма Weekly; скругление только сверху (снизу без скругления — без просвета синего).
+   Отрицательный margin к стыку с героем: закрывает синюю щель между лучами и скруглением листа.
+   pointer-events: контейнер не ловит клики — они проходят к шапке под листом; контент листа — auto */
 .game-sheet {
   position: relative;
   z-index: 1;
-  margin-top: -24px;
+  margin-top: calc(-1 * var(--game-sheet-pull, 24px));
   background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+  border-radius: 20px 20px 0 0;
+  /* Только «вверх» к герою: полное 0 0 4px давало серую линию снизу листа на белом padding скролла */
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.06);
   padding: 8px 0 8px;
   overflow: visible;
+  pointer-events: none;
+}
+
+.game-sheet * {
+  pointer-events: auto;
 }
 
 .game-sheet h2,

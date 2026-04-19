@@ -1,39 +1,71 @@
+(function initGameScrollHeroPad() {
+  "use strict";
+  const main = document.querySelector(".game-main");
+  const hero = document.querySelector(".game-hero");
+  const scrollEl = document.querySelector(".game-scroll");
+  if (!main || !hero || !scrollEl) return;
+
+  /* Не height героя: верх героя выше .game-main из‑за margin-top, иначе padding-top
+     завышается и между низом лучей и белым остаётся синяя полоса */
+  function syncHeroHeight() {
+    var mt = main.getBoundingClientRect().top;
+    var h = hero.getBoundingClientRect().bottom - mt;
+    if (h < 1) return;
+    scrollEl.style.setProperty("--game-hero-h", h.toFixed(2) + "px");
+    window.dispatchEvent(new CustomEvent("gameHeroPadUpdated"));
+  }
+
+  if (typeof ResizeObserver !== "undefined") {
+    var ro = new ResizeObserver(function () {
+      syncHeroHeight();
+    });
+    ro.observe(hero);
+    ro.observe(main);
+  } else {
+    window.addEventListener("resize", syncHeroHeight, { passive: true });
+  }
+  window.addEventListener("load", syncHeroHeight, { once: true });
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () {
+      syncHeroHeight();
+    });
+  }
+  requestAnimationFrame(function () {
+    requestAnimationFrame(syncHeroHeight);
+  });
+})();
+
 (function initGameHeaderScrolledState() {
   "use strict";
-  const inner = document.querySelector(".game__inner");
-  const header = document.querySelector(".game-header");
-  const sentinel = document.querySelector(".game-header-scroll-sentinel");
-  if (!inner || !header || !sentinel) return;
+  const scrollEl = document.querySelector(".game-scroll");
+  const headerNew = document.querySelector(".game-header-new");
+  if (!scrollEl || !headerNew) return;
 
   function setScrolled(scrolled) {
-    header.classList.toggle("game-header--scrolled", scrolled);
+    headerNew.classList.toggle("game-header-new--visible", scrolled);
+    headerNew.setAttribute("aria-hidden", scrolled ? "false" : "true");
   }
 
-  if (typeof IntersectionObserver !== "undefined") {
-    const headerOffset = parseInt(
-      String(getComputedStyle(inner).getPropertyValue("--game-header-offset") || "64").trim(),
-      10
-    ) || 64;
-    /* Исключаем зону липкой шапки: иначе сентинел «пересекает» root, будучи под шапкой, и класс не включается */
-    const topInset = `-${headerOffset}px`;
-    const io = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        if (!entry) return;
-        /* Пока сентинел попадает в область под шапкой — верх; иначе — скроллили */
-        setScrolled(!entry.isIntersecting);
-      },
-      { root: inner, rootMargin: `${topInset} 0px 0px 0px`, threshold: 0 }
-    );
-    io.observe(sentinel);
-  } else {
-    const THRESHOLD = 2;
-    function sync() {
-      setScrolled(inner.scrollTop > THRESHOLD);
+  /* new header: когда верх белого листа начинает уходить за край экрана */
+  function frostThreshold() {
+    var pad = parseFloat(getComputedStyle(scrollEl).paddingTop) || 0;
+    var sheet = document.querySelector(".game-sheet");
+    var pull = 0;
+    if (sheet) {
+      pull = Math.abs(parseFloat(getComputedStyle(sheet).marginTop)) || 0;
     }
-    inner.addEventListener("scroll", sync, { passive: true });
-    sync();
+    return Math.max(0, pad - pull);
   }
+
+  function sync() {
+    var th = frostThreshold();
+    setScrolled(scrollEl.scrollTop >= th - 0.5);
+  }
+
+  scrollEl.addEventListener("scroll", sync, { passive: true });
+  window.addEventListener("resize", sync, { passive: true });
+  window.addEventListener("gameHeroPadUpdated", sync, { passive: true });
+  sync();
 })();
 
 (function () {

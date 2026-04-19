@@ -25,7 +25,7 @@
   const glyph = document.getElementById("dailyCellTodayGlyph");
   const mark = document.getElementById("dailyCellTodayMark");
   const streakHint = document.getElementById("dailyStreakHint");
-  const balanceVal = document.getElementById("headerBalanceValue");
+  const balanceVal = document.querySelector(".js-header-balance-value");
   const weekVal = document.getElementById("headerWeekProgress");
   const weekPill = document.querySelector(".game-hero__week-pill");
 
@@ -104,6 +104,12 @@
     };
   }
 
+  function setHeaderBalanceText(s) {
+    document.querySelectorAll(".js-header-balance-value").forEach(function (el) {
+      el.textContent = s;
+    });
+  }
+
   function parseBalanceText() {
     if (!balanceVal) return DEFAULT_BALANCE;
     const n = parseInt(String(balanceVal.textContent).replace(/[^\d]/g, ""), 10);
@@ -114,7 +120,7 @@
     if (!balanceVal) return;
     const stored = getSavedBalance();
     if (stored != null) {
-      balanceVal.textContent = String(stored);
+      setHeaderBalanceText(String(stored));
     }
   }
 
@@ -207,7 +213,7 @@
     const fromW = wParts.earned;
     const toW = Math.min(fromW + n, weekMax);
 
-    balanceVal.textContent = String(toB);
+    setHeaderBalanceText(String(toB));
     setSavedBalance(toB);
 
     if (!weekVal) {
@@ -330,8 +336,8 @@
   }
 
   function resetGameInnerScrollTop() {
-    var inner = document.querySelector(".game__inner");
-    if (inner) inner.scrollTop = 0;
+    var scrollEl = document.querySelector(".game-scroll");
+    if (scrollEl) scrollEl.scrollTop = 0;
   }
 
   initBalance();

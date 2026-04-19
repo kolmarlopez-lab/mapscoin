@@ -321,7 +321,7 @@
         }
       }
       pro.classList.toggle("award-card__progress--scroll", nSeg > 3);
-      /* Не крутим прогресс при первом paint — на мобильных сдвиг scrollLeft/раскладка двигают .game__inner вниз */
+      /* Не крутим прогресс при первом paint — на мобильных сдвиг scrollLeft/раскладка двигают скролл экрана вниз */
       if (nSeg > 3 && !skipProgressScroll) {
         var segScroll = segs[hi];
         if (segScroll) {

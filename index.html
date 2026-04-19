@@ -13,65 +13,8 @@
     <div class="screen-game">
 <div class="game">
       <div class="game__inner">
-        <!-- 4082:30374 — шапка липкая при скролле; вынесена из .game-hero, чтобы z-index был выше .game-sheet -->
-        <div class="game-header">
-          <button type="button" class="game-header__ico" aria-label="Справка">
-            <span class="game-header__ico-stack" aria-hidden="true">
-              <img
-                class="game-header__ico-img game-header__ico-img--light"
-                src="assets/screen/header-icon-info.svg"
-                width="24"
-                height="24"
-                alt=""
-                decoding="async"
-              />
-              <img
-                class="game-header__ico-img game-header__ico-img--dark"
-                src="assets/screen/header-icon-info-secondary.svg"
-                width="24"
-                height="24"
-                alt=""
-                decoding="async"
-              />
-            </span>
-          </button>
-          <div class="game-balance">
-            <div class="game-balance__pill" role="status" aria-label="Баланс баллов">
-              <div class="game-balance__row">
-                <span class="game-balance__value" id="headerBalanceValue">1800</span>
-                <div class="game-balance__ico-box" aria-hidden="true">
-                  <img
-                    class="game-balance__ico"
-                    src="assets/screen/balance-plus-glyph.svg"
-                    alt=""
-                    decoding="async"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-          <button type="button" class="game-header__ico" aria-label="Закрыть">
-            <span class="game-header__ico-stack" aria-hidden="true">
-              <img
-                class="game-header__ico-img game-header__ico-img--light"
-                src="assets/screen/header-icon-close.svg"
-                width="24"
-                height="24"
-                alt=""
-                decoding="async"
-              />
-              <img
-                class="game-header__ico-img game-header__ico-img--dark"
-                src="assets/screen/header-icon-close-secondary.svg"
-                width="24"
-                height="24"
-                alt=""
-                decoding="async"
-              />
-            </span>
-          </button>
-        </div>
-        <div class="game-header-scroll-sentinel" aria-hidden="true"></div>
+        <!-- basic header в герое (под белым листом); new header — только после порога скролла, над листом -->
+        <div class="game-main">
         <header class="game-hero" aria-label="Прогресс за неделю">
           <div class="game-hero__decor" aria-hidden="true">
             <!-- 2277:43684 Rays — фрейм 375×251 в макете -->
@@ -101,6 +44,47 @@
             </div>
             <div class="game-hero__glow"></div>
           </div>
+          <div class="game-header-basic">
+            <button type="button" class="game-header__ico" aria-label="Справка">
+              <span class="game-header__ico-stack" aria-hidden="true">
+                <img
+                  class="game-header__ico-img"
+                  src="assets/screen/header-icon-info.svg"
+                  width="24"
+                  height="24"
+                  alt=""
+                  decoding="async"
+                />
+              </span>
+            </button>
+            <div class="game-balance">
+              <div class="game-balance__pill" role="status" aria-label="Баланс баллов">
+                <div class="game-balance__row">
+                  <span class="game-balance__value js-header-balance-value" id="headerBalanceValue">1800</span>
+                  <div class="game-balance__ico-box" aria-hidden="true">
+                    <img
+                      class="game-balance__ico"
+                      src="assets/screen/balance-plus-glyph.svg"
+                      alt=""
+                      decoding="async"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="game-header__ico" aria-label="Закрыть">
+              <span class="game-header__ico-stack" aria-hidden="true">
+                <img
+                  class="game-header__ico-img"
+                  src="assets/screen/header-icon-close.svg"
+                  width="24"
+                  height="24"
+                  alt=""
+                  decoding="async"
+                />
+              </span>
+            </button>
+          </div>
           <div class="game-hero__text">
             <h1 class="game-hero__title-sr">Выполняйте задания за баллы</h1>
             <div class="game-hero__text-inner">
@@ -125,6 +109,7 @@
             </div>
           </div>
         </header>
+        <div class="game-scroll">
         <div class="game-sheet">
           <div class="game-slab">
             <h2 class="game-slab__h">Баллы за вход</h2>
@@ -708,6 +693,52 @@
               </div>
             </div>
           </section>
+        </div>
+        </div>
+        <div class="game-header-new" aria-hidden="true">
+          <div class="game-header-new__frost" aria-hidden="true"></div>
+          <div class="game-header-new__row">
+            <button type="button" class="game-header__ico" aria-label="Справка">
+              <span class="game-header__ico-stack" aria-hidden="true">
+                <img
+                  class="game-header__ico-img"
+                  src="assets/screen/header-icon-info-secondary.svg"
+                  width="24"
+                  height="24"
+                  alt=""
+                  decoding="async"
+                />
+              </span>
+            </button>
+            <div class="game-balance">
+              <div class="game-balance__pill" role="status" aria-label="Баланс баллов">
+                <div class="game-balance__row">
+                  <span class="game-balance__value js-header-balance-value">1800</span>
+                  <div class="game-balance__ico-box" aria-hidden="true">
+                    <img
+                      class="game-balance__ico"
+                      src="assets/screen/balance-plus-glyph.svg"
+                      alt=""
+                      decoding="async"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="game-header__ico" aria-label="Закрыть">
+              <span class="game-header__ico-stack" aria-hidden="true">
+                <img
+                  class="game-header__ico-img"
+                  src="assets/screen/header-icon-close-secondary.svg"
+                  width="24"
+                  height="24"
+                  alt=""
+                  decoding="async"
+                />
+              </span>
+            </button>
+          </div>
+        </div>
         </div>
       </div>
     </div>
