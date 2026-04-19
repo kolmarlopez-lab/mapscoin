@@ -294,6 +294,8 @@
                   data-state="active"
                   data-task="spotlight"
                   data-task-title="Выполните все задания на этой неделе"
+                  data-task-detail-desc="Выполните все задания из списка ниже — после этого можно будет получить награду главного задания."
+                  data-task-detail-steps="Откройте раздел «Можно выполнить»|Выполните каждое простое и многоэтапное задание|Нажмите «Получить» за награду каждого задания"
                   aria-label="Главное задание недели: все задания выполнены"
                 >
                   <div class="award-card__top">
@@ -355,6 +357,8 @@
                   data-state="active"
                   data-task="extra1"
                   data-task-title="Посетите кофейню из подборки «Рядом»"
+                  data-task-detail-desc="Откройте карточку кофейни из подборки «Рядом» — так мы поймём, что вы воспользовались подсказкой."
+                  data-task-detail-steps="Перейдите на главный экран карт|Откройте подборку «Рядом»|Выберите кофейню и откройте её карточку"
                   aria-label="Простое задание: визит в кофейню"
                 >
                   <div class="award-card__top">
@@ -402,6 +406,10 @@
                   class="award-card award-card--active award-card--task-cursor award-card--task-cursor--active"
                   data-state="active"
                   data-task="milestone"
+                  data-task-detail-desc="Несколько раз в неделю открывайте карточки кофеен — на карте или из поиска. За каждый этап начисляются баллы."
+                  data-task-detail-steps="Найдите кофейню на карте или через поиск|Откройте карточку организации|Повторите нужное число раз за неделю"
+                  data-task-detail-stage-hints="Первый визит за неделю: откройте карточку любой кофейни — засчитается этап на 10 баллов.|||Второй визит в другой день или у другой точки — этап на 20 баллов.|||Третий визит за неделю — этап на 30 баллов, после него задание выполнено."
+                  data-task-detail-step-labels="1 кофейня|||2 кофейня|||3 кофейня"
                   aria-label="Этапы наград"
                 >
                   <div class="award-card__top">
@@ -482,6 +490,10 @@
                   data-state="active"
                   data-task="multi1"
                   data-task-title="Отзывы в течение недели — семь этапов наград"
+                  data-task-detail-desc="Оставляйте отзывы о посещениях в течение недели — награда начисляется за каждый этап."
+                  data-task-detail-steps="Откройте карточку места, где вы были|Оставьте отзыв|Дождитесь засчитанного этапа и получите баллы"
+                  data-task-detail-stage-hints="Первый отзыв за неделю — 10 баллов за этап.|||Второй отзыв — ещё 10 баллов.|||Третий отзыв — 10 баллов.|||Четвёртый отзыв — 10 баллов.|||Пятый отзыв — 10 баллов.|||Шестой отзыв — 10 баллов.|||Седьмой отзыв — 20 баллов, после него задание завершено."
+                  data-task-detail-step-labels="1-й отзыв|||2-й отзыв|||3-й отзыв|||4-й отзыв|||5-й отзыв|||6-й отзыв|||7-й отзыв"
                   aria-label="Этапы за отзывы: семь шагов"
                 >
                   <div class="award-card__top">
@@ -616,6 +628,8 @@
                   data-state="active"
                   data-task="bonus"
                   data-task-title="Откройте экран «Акции недели»"
+                  data-task-detail-desc="Один раз за неделю откройте экран с акциями — этого достаточно, чтобы задание засчиталось."
+                  data-task-detail-steps="Откройте меню или раздел «Акции недели»|Просмотрите подборку|Вернитесь к заданию и нажмите «Получить»"
                   aria-label="Простое задание: акции недели"
                 >
                   <div class="award-card__top">
@@ -677,6 +691,78 @@
       </div>
     </div>
     </div>
+
+    <div id="taskDetailRoot" class="task-detail" hidden>
+      <div class="task-detail__backdrop" tabindex="-1" aria-hidden="true"></div>
+      <div
+        class="task-detail__sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="taskDetailHeading"
+      >
+        <!-- Figma Task Details / Header 2286:16970: h 157, белая подложка только снизу 94px, иконка 132px −8° «вылетает» в зону оверлея -->
+        <div class="task-detail__hero" aria-hidden="true">
+          <div class="task-detail__hero-cap"></div>
+          <div class="task-detail__icon-rot">
+            <div class="task-detail__icon-bg">
+              <div class="task-detail__icon-inner">
+                <img
+                  class="task-detail__icon-img"
+                  id="taskDetailHeroImg"
+                  src="assets/coffee.png"
+                  width="64"
+                  height="64"
+                  alt=""
+                  decoding="async"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="task-detail__scroll">
+          <div class="task-detail__block task-detail__block--text">
+            <h2 id="taskDetailHeading" class="task-detail__heading"></h2>
+            <p class="task-detail__lead" id="taskDetailLead" hidden></p>
+            <p class="task-detail__step-meta" id="taskDetailStepMeta" hidden></p>
+            <p class="task-detail__stage-hint" id="taskDetailStageHint" hidden></p>
+          </div>
+          <div class="task-detail__instr" id="taskDetailInstr" hidden>
+            <button type="button" class="task-detail__instr-toggle" id="taskDetailInstrToggle" aria-expanded="false">
+              Инструкция к заданию
+            </button>
+            <ol class="task-detail__steps" id="taskDetailSteps" hidden></ol>
+          </div>
+          <!-- Figma 2292:16984 TaskDetailsComposite — список этапов для многошаговых -->
+          <div class="task-detail__composite" id="taskDetailComposite" hidden aria-label="Этапы задания"></div>
+          <div class="task-detail__gift-block" id="taskDetailGift">
+            <div class="task-detail__sep" aria-hidden="true"></div>
+            <div class="task-detail__gift-row">
+              <div class="task-detail__gift-copy">
+                <p class="task-detail__gift-label">Подарок за выполнение</p>
+                <p class="task-detail__gift-status" id="taskDetailGiftStatus"></p>
+              </div>
+              <div class="task-detail__gift-tag" id="taskDetailGiftTag">
+                <span class="task-detail__gift-val" id="taskDetailGiftVal"></span>
+                <img
+                  class="task-detail__gift-ico"
+                  id="taskDetailGiftIco"
+                  src="assets/screen/award-coin-glyph-warm.svg"
+                  width="16"
+                  height="16"
+                  alt=""
+                  decoding="async"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="task-detail__actions">
+            <button type="button" class="task-detail__btn" id="taskDetailAction"></button>
+          </div>
+          <div class="task-detail__home-bar" aria-hidden="true"><span class="task-detail__home-bar-pill"></span></div>
+        </div>
+      </div>
+    </div>
+
     <script src="haptics.js"></script>
     <script src="coins.js"></script>
     <script src="tasks.js"></script>

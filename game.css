@@ -1211,3 +1211,495 @@
   }
 }
 
+/* 2439:82680 — подробности задания (bottom sheet, Figma Task Details) */
+body.task-detail-open {
+  overflow: hidden;
+}
+
+.task-detail {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.task-detail[hidden] {
+  display: none !important;
+}
+
+.task-detail__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transition: opacity 0.34s ease;
+}
+
+.task-detail--open .task-detail__backdrop {
+  opacity: 1;
+}
+
+/* Ширина колонки как у .screen-game / .game__inner (max-width: 375px) */
+.task-detail__sheet {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 375px;
+  max-height: min(92vh, 720px);
+  overflow: visible;
+  background: transparent;
+  box-sizing: border-box;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
+  transform: translate3d(0, 100%, 0);
+  transition: transform 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.task-detail--open .task-detail__sheet {
+  transform: translate3d(0, 0, 0);
+}
+
+/* 2286:16970 — зона 157px: верх без белой заливки (вылет), снизу 94px белая плашка со скруглением */
+/* z-index выше .task-detail__scroll: иначе белый фон скролла перекрывает overflow иконки у нижней границы шапки */
+.task-detail__hero {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  height: 157px;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.task-detail__hero-cap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 94px;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  z-index: 0;
+}
+
+/* 2286:16966 — Form 132×132, rotate −8°; центр в области шапки */
+.task-detail__icon-rot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 149px;
+  height: 149px;
+  transform: translate(-50%, -50%) rotate(-8deg);
+  pointer-events: none;
+}
+
+.task-detail__icon-bg {
+  width: 132px;
+  height: 132px;
+  border-radius: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(110% 95% at 50% 100%, rgba(255, 119, 51, 0.42) 0%, rgba(255, 191, 0, 0) 55%),
+    linear-gradient(180deg, #ff7657 0%, #ffbf00 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.task-detail__icon-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.task-detail__icon-img {
+  display: block;
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.task-detail__scroll {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: #fff;
+}
+
+.task-detail__block--text {
+  padding: 8px 16px 8px;
+  box-sizing: border-box;
+}
+
+.task-detail__heading {
+  margin: 0;
+  font-size: 24px;
+  line-height: 28px;
+  font-weight: 700;
+  color: #000;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-synthesis: none;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+}
+
+.task-detail__lead {
+  margin: 8px 0 0;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 400;
+  color: #000;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-synthesis: none;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+}
+
+.task-detail__step-meta {
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 500;
+  color: #196dff;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-synthesis: none;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+}
+
+.task-detail__stage-hint {
+  margin: 8px 0 0;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 400;
+  color: #000;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-synthesis: none;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+}
+
+.task-detail__instr {
+  padding: 0 16px 12px;
+  box-sizing: border-box;
+}
+
+.task-detail__instr-toggle {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: 500;
+  color: #196dff;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-synthesis: none;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+}
+
+.task-detail__instr-toggle:hover {
+  opacity: 0.88;
+}
+
+.task-detail__instr--open .task-detail__instr-toggle {
+  display: none;
+}
+
+.task-detail__steps {
+  margin: 0;
+  padding: 0 0 0 1.25em;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 400;
+  color: #000;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  list-style: decimal;
+}
+
+.task-detail__steps li {
+  margin: 0 0 0.25em;
+  padding-left: 0.25em;
+}
+
+.task-detail__steps li:last-child {
+  margin-bottom: 0;
+}
+
+/* Figma 2292:16984 TaskDetailsComposite — строки этапов, разделители, теги */
+.task-detail__composite {
+  padding: 0 0 4px;
+  background: #fff;
+}
+
+.task-detail__comp-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  box-sizing: border-box;
+}
+
+.task-detail__comp-body {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.task-detail__comp-title {
+  margin: 0;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 400;
+  color: #000;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-synthesis: none;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+}
+
+.task-detail__comp-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: 2px;
+}
+
+.task-detail__comp-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.task-detail__comp-check img {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
+.task-detail__comp-status-ok {
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 500;
+  color: #3bb300;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-synthesis: none;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+}
+
+.task-detail__comp-status-pending {
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 500;
+  color: #878787;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-synthesis: none;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+}
+
+.task-detail__comp-tag {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px 4px 4px 6px;
+  border-radius: 100px;
+  border: 1px solid #ebebeb;
+  background: #fff;
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: 500;
+  color: #000;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+  font-synthesis: none;
+}
+
+.task-detail__comp-tag-val {
+  line-height: 16px;
+}
+
+.task-detail__comp-tag-ico {
+  display: block;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.task-detail__comp-sep {
+  height: 1px;
+  margin: 0 16px;
+  background: #ebebeb;
+}
+
+.task-detail__gift-block {
+  padding: 0 0 4px;
+}
+
+.task-detail__sep {
+  height: 1px;
+  margin: 0 16px;
+  background: #ebebeb;
+}
+
+.task-detail__gift-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  box-sizing: border-box;
+}
+
+.task-detail__gift-copy {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.task-detail__gift-label {
+  margin: 0;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+  color: #000;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-synthesis: none;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+}
+
+.task-detail__gift-status {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 500;
+  color: #878787;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-synthesis: none;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+}
+
+.task-detail__gift-tag {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px 4px 4px 6px;
+  border-radius: 100px;
+  border: 1px solid #ebebeb;
+  background: #fff;
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: 500;
+  color: #000;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+  font-synthesis: none;
+}
+
+.task-detail__gift-val {
+  line-height: 16px;
+}
+
+.task-detail__gift-ico {
+  display: block;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.task-detail__actions {
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.task-detail__btn {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 16px;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+  font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-feature-settings: "lnum" 1, "pnum" 1;
+  padding: 14px 16px;
+  text-align: center;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background 0.12s ease, transform 0.1s ease, opacity 0.12s ease;
+}
+
+.task-detail__btn--secondary {
+  background: #f6f6f6;
+  color: #4d4d4d;
+}
+
+.task-detail__btn--secondary:hover {
+  background: #ececec;
+}
+
+.task-detail__btn--primary {
+  background: #196dff;
+  color: #fff;
+}
+
+.task-detail__btn--primary:hover {
+  background: #155fcc;
+}
+
+.task-detail__btn:active {
+  transform: scale(0.99);
+}
+
+.task-detail__home-bar {
+  position: relative;
+  min-height: 21px;
+  background: #fff;
+}
+
+.task-detail__home-bar-pill {
+  display: block;
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  width: 135px;
+  height: 5px;
+  margin-left: -67.5px;
+  border-radius: 100px;
+  background: #000;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .task-detail__btn:active {
+    transform: none;
+  }
+  .task-detail__icon-rot {
+    transform: translate(-50%, -50%);
+  }
+  .task-detail__backdrop,
+  .task-detail__sheet {
+    transition: none !important;
+  }
+}
+

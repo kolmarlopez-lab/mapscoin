@@ -92,6 +92,30 @@
 
   const panelAv = document.getElementById("task-panel-available");
   const panelDone = document.getElementById("task-panel-done");
+  const taskPanels = document.querySelector(".task-panels");
+  const taskDetailRoot = document.getElementById("taskDetailRoot");
+  const taskDetailHeading = document.getElementById("taskDetailHeading");
+  const taskDetailLead = document.getElementById("taskDetailLead");
+  const taskDetailInstr = document.getElementById("taskDetailInstr");
+  const taskDetailInstrToggle = document.getElementById("taskDetailInstrToggle");
+  const taskDetailSteps = document.getElementById("taskDetailSteps");
+  const taskDetailGift = document.getElementById("taskDetailGift");
+  const taskDetailGiftStatus = document.getElementById("taskDetailGiftStatus");
+  const taskDetailGiftVal = document.getElementById("taskDetailGiftVal");
+  const taskDetailAction = document.getElementById("taskDetailAction");
+  const taskDetailBackdrop = taskDetailRoot ? taskDetailRoot.querySelector(".task-detail__backdrop") : null;
+  const taskDetailSheet = taskDetailRoot ? taskDetailRoot.querySelector(".task-detail__sheet") : null;
+  const taskDetailScroll = taskDetailRoot ? taskDetailRoot.querySelector(".task-detail__scroll") : null;
+  const taskDetailStepMeta = document.getElementById("taskDetailStepMeta");
+  const taskDetailStageHint = document.getElementById("taskDetailStageHint");
+  const taskDetailComposite = document.getElementById("taskDetailComposite");
+
+  var taskDetailArticle = null;
+  var taskDetailKey = null;
+  var taskDetailFocusBack = null;
+  var taskDetailCloseTimer = null;
+  var taskDetailCloseDone = null;
+
   if (!panelAv || !panelDone) return;
 
   const emptyLine = document.querySelector(".js-task-done-empty");
@@ -494,6 +518,321 @@
     setTimeout(go, 780);
   }
 
+  function parseTaskDetailSteps(raw) {
+    if (!raw || !String(raw).trim()) return [];
+    return String(raw)
+      .split("|")
+      .map(function (s) {
+        return s.trim();
+      })
+      .filter(Boolean);
+  }
+
+  /** Подсказки по этапам для MULTI_TASK (разделитель «|||», по одному на этап). */
+  function parseTaskDetailStageHints(raw) {
+    if (!raw || !String(raw).trim()) return [];
+    return String(raw)
+      .split("|||")
+      .map(function (s) {
+        return s.trim();
+      })
+      .filter(Boolean);
+  }
+
+  function parseTaskDetailStepLabels(raw) {
+    return parseTaskDetailStageHints(raw);
+  }
+
+  /** Figma 2292:16984 — список этапов с статусами и тегами баллов */
+  function buildTaskDetailComposite(art, key) {
+    if (!taskDetailComposite) return;
+    taskDetailComposite.innerHTML = "";
+    var stepsPts = MULTI_STEPS[key];
+    var st = S[key];
+    if (!stepsPts || !st) {
+      taskDetailComposite.hidden = true;
+      return;
+    }
+    var labels = parseTaskDetailStepLabels(art.getAttribute("data-task-detail-step-labels") || "");
+    var n = stepsPts.length;
+    var doneIdx = st.claimed;
+    var i;
+    for (i = 0; i < n; i++) {
+      if (i > 0) {
+        var sep = document.createElement("div");
+        sep.className = "task-detail__comp-sep";
+        sep.setAttribute("aria-hidden", "true");
+        taskDetailComposite.appendChild(sep);
+      }
+      var row = document.createElement("div");
+      row.className = "task-detail__comp-row";
+      var body = document.createElement("div");
+      body.className = "task-detail__comp-body";
+      var title = document.createElement("p");
+      title.className = "task-detail__comp-title";
+      title.textContent = labels[i] || "Этап " + (i + 1);
+      body.appendChild(title);
+      var meta = document.createElement("div");
+      if (i < doneIdx) {
+        meta.className = "task-detail__comp-meta task-detail__comp-meta--done";
+        var chk = document.createElement("span");
+        chk.className = "task-detail__comp-check";
+        var vimg = document.createElement("img");
+        vimg.src = "assets/verified.svg";
+        vimg.width = 14;
+        vimg.height = 14;
+        vimg.alt = "";
+        vimg.decoding = "async";
+        chk.appendChild(vimg);
+        var ok = document.createElement("span");
+        ok.className = "task-detail__comp-status-ok";
+        ok.textContent = "Выполнено";
+        meta.appendChild(chk);
+        meta.appendChild(ok);
+      } else {
+        meta.className = "task-detail__comp-meta";
+        var pend = document.createElement("span");
+        pend.className = "task-detail__comp-status-pending";
+        pend.textContent = "В процессе";
+        meta.appendChild(pend);
+      }
+      body.appendChild(meta);
+      row.appendChild(body);
+      var tag = document.createElement("div");
+      tag.className = "task-detail__comp-tag";
+      var val = document.createElement("span");
+      val.className = "task-detail__comp-tag-val";
+      val.textContent = String(stepsPts[i]);
+      var cimg = document.createElement("img");
+      cimg.className = "task-detail__comp-tag-ico";
+      cimg.width = 16;
+      cimg.height = 16;
+      cimg.alt = "";
+      cimg.decoding = "async";
+      cimg.src = i > doneIdx ? MILE_COIN_MUT : MILE_COIN_WARM;
+      tag.appendChild(val);
+      tag.appendChild(cimg);
+      row.appendChild(tag);
+      taskDetailComposite.appendChild(row);
+    }
+    taskDetailComposite.hidden = false;
+  }
+
+  function getRewardPointsFromCard(art) {
+    if (!art) return "";
+    var on = art.querySelector(".award-card__tag--on .award-card__tag-val");
+    if (on) return on.textContent.trim();
+    var ex = art.querySelector(".js-extra-tag-val");
+    if (ex) return ex.textContent.trim();
+    return "";
+  }
+
+  function openTaskDetail(art) {
+    if (!taskDetailRoot || !taskDetailHeading || !taskDetailAction) return;
+    taskDetailArticle = art;
+    taskDetailKey = art.getAttribute("data-task");
+    var claimed = art.classList.contains("js-task-claimed");
+
+    var titleEl = art.querySelector(".award-card__title");
+    var title = titleEl ? titleEl.textContent.trim() : "";
+    taskDetailHeading.textContent = title;
+
+    var desc = (art.getAttribute("data-task-detail-desc") || "").trim();
+    if (taskDetailLead) {
+      if (desc) {
+        taskDetailLead.textContent = desc;
+        taskDetailLead.hidden = false;
+      } else {
+        taskDetailLead.textContent = "";
+        taskDetailLead.hidden = true;
+      }
+    }
+
+    if (taskDetailStepMeta) {
+      taskDetailStepMeta.textContent = "";
+      taskDetailStepMeta.hidden = true;
+    }
+    if (taskDetailStageHint) {
+      taskDetailStageHint.textContent = "";
+      taskDetailStageHint.hidden = true;
+    }
+    if (taskDetailComposite) {
+      taskDetailComposite.innerHTML = "";
+      taskDetailComposite.hidden = true;
+    }
+
+    var showMultiComposite =
+      !claimed &&
+      taskDetailKey &&
+      isMultiTask(taskDetailKey) &&
+      S[taskDetailKey] &&
+      MULTI_STEPS[taskDetailKey];
+
+    if (showMultiComposite) {
+      buildTaskDetailComposite(art, taskDetailKey);
+    }
+
+    var steps = parseTaskDetailSteps(art.getAttribute("data-task-detail-steps"));
+    if (taskDetailInstr && taskDetailInstrToggle && taskDetailSteps) {
+      taskDetailInstr.classList.remove("task-detail__instr--open");
+      taskDetailInstrToggle.hidden = false;
+      taskDetailInstrToggle.setAttribute("aria-expanded", "false");
+      taskDetailSteps.innerHTML = "";
+      if (claimed || steps.length === 0) {
+        taskDetailInstr.hidden = true;
+        taskDetailSteps.hidden = true;
+      } else {
+        taskDetailInstr.hidden = false;
+        steps.forEach(function (text) {
+          var li = document.createElement("li");
+          li.textContent = text;
+          taskDetailSteps.appendChild(li);
+        });
+        taskDetailSteps.hidden = true;
+      }
+    }
+
+    if (taskDetailGift && taskDetailGiftStatus && taskDetailGiftVal) {
+      if (showMultiComposite) {
+        taskDetailGift.hidden = true;
+      } else if (claimed) {
+        taskDetailGift.hidden = false;
+        var pt = art.querySelector(".award-card__points-txt");
+        var m = pt && pt.textContent.match(/(\d+)/);
+        taskDetailGiftVal.textContent = m ? m[1] : "—";
+        taskDetailGiftStatus.textContent = "Выполнено";
+      } else if (!taskDetailKey) {
+        taskDetailGift.hidden = true;
+      } else {
+        taskDetailGift.hidden = false;
+        var st = S[taskDetailKey];
+        var ready = st && st.s === "ready";
+        taskDetailGiftStatus.textContent = ready ? "Готово к получению" : "В процессе";
+        var dr = art.getAttribute("data-reward");
+        if (ready && dr) {
+          taskDetailGiftVal.textContent = String(parseInt(dr, 10));
+        } else {
+          taskDetailGiftVal.textContent = getRewardPointsFromCard(art) || "—";
+        }
+      }
+    }
+
+    if (claimed || !taskDetailKey) {
+      taskDetailAction.className = "task-detail__btn task-detail__btn--secondary";
+      taskDetailAction.textContent = "Хорошо";
+      taskDetailAction.removeAttribute("data-action");
+    } else {
+      var stB = S[taskDetailKey];
+      var readyB = stB && stB.s === "ready";
+      if (readyB) {
+        var n = parseInt(art.getAttribute("data-reward") || "0", 10);
+        taskDetailAction.className = "task-detail__btn task-detail__btn--primary";
+        taskDetailAction.textContent = "Получить " + n + " баллов";
+        taskDetailAction.setAttribute("data-action", "claim");
+      } else {
+        taskDetailAction.className = "task-detail__btn task-detail__btn--secondary";
+        taskDetailAction.textContent = "Хорошо";
+        taskDetailAction.removeAttribute("data-action");
+      }
+    }
+
+    taskDetailFocusBack = document.activeElement;
+    if (taskDetailScroll) taskDetailScroll.scrollTop = 0;
+
+    taskDetailRoot.hidden = false;
+    taskDetailRoot.classList.remove("task-detail--open");
+    document.body.classList.add("task-detail-open");
+
+    function focusAction() {
+      taskDetailAction.focus();
+    }
+
+    if (prefersReducedMotion()) {
+      taskDetailRoot.classList.add("task-detail--open");
+      focusAction();
+      return;
+    }
+
+    void taskDetailRoot.offsetWidth;
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        taskDetailRoot.classList.add("task-detail--open");
+        focusAction();
+      });
+    });
+  }
+
+  function finalizeTaskDetailClose() {
+    if (taskDetailCloseTimer) {
+      window.clearTimeout(taskDetailCloseTimer);
+      taskDetailCloseTimer = null;
+    }
+    if (taskDetailSheet && taskDetailCloseDone) {
+      taskDetailSheet.removeEventListener("transitionend", taskDetailCloseDone);
+      taskDetailCloseDone = null;
+    }
+    if (!taskDetailRoot) return;
+    taskDetailRoot.hidden = true;
+    taskDetailRoot.classList.remove("task-detail--open");
+    document.body.classList.remove("task-detail-open");
+    taskDetailArticle = null;
+    taskDetailKey = null;
+    if (taskDetailFocusBack && typeof taskDetailFocusBack.focus === "function") {
+      try {
+        taskDetailFocusBack.focus();
+      } catch (e) {
+        void e;
+      }
+    }
+    taskDetailFocusBack = null;
+  }
+
+  function closeTaskDetail() {
+    if (!taskDetailRoot || taskDetailRoot.hidden) return;
+
+    if (!taskDetailRoot.classList.contains("task-detail--open")) {
+      finalizeTaskDetailClose();
+      return;
+    }
+
+    if (prefersReducedMotion()) {
+      finalizeTaskDetailClose();
+      return;
+    }
+
+    taskDetailRoot.classList.remove("task-detail--open");
+
+    var finished = false;
+    function done(ev) {
+      if (finished) return;
+      if (ev) {
+        if (ev.target !== taskDetailSheet) return;
+        if (ev.propertyName !== "transform") return;
+      }
+      finished = true;
+      if (taskDetailCloseTimer) {
+        window.clearTimeout(taskDetailCloseTimer);
+        taskDetailCloseTimer = null;
+      }
+      if (taskDetailSheet && taskDetailCloseDone) {
+        taskDetailSheet.removeEventListener("transitionend", taskDetailCloseDone);
+        taskDetailCloseDone = null;
+      }
+      finalizeTaskDetailClose();
+    }
+
+    if (taskDetailSheet) {
+      taskDetailCloseDone = done;
+      taskDetailSheet.addEventListener("transitionend", taskDetailCloseDone);
+      taskDetailCloseTimer = window.setTimeout(function () {
+        taskDetailCloseTimer = null;
+        done(null);
+      }, 480);
+    } else {
+      finalizeTaskDetailClose();
+    }
+  }
+
   function bind() {
     panelAv.addEventListener("click", function (e) {
       var claimBtn = e.target.closest(".js-task-claim");
@@ -515,6 +854,46 @@
       else if (k === "bonus") onAdvanceBonus(p);
       else if (isExtraTask(k)) onAdvanceExtra(p, k);
     });
+
+    if (taskPanels) {
+      taskPanels.addEventListener("click", function (e) {
+        if (!e.target.closest(".award-card__link")) return;
+        var artOpen = e.target.closest("article");
+        if (!artOpen || !taskPanels.contains(artOpen)) return;
+        e.preventDefault();
+        openTaskDetail(artOpen);
+      });
+    }
+
+    if (taskDetailRoot && taskDetailBackdrop && taskDetailAction) {
+      taskDetailBackdrop.addEventListener("click", closeTaskDetail);
+      taskDetailAction.addEventListener("click", function () {
+        var act = taskDetailAction.getAttribute("data-action");
+        if (act === "claim" && taskDetailArticle && taskDetailKey) {
+          claim(taskDetailArticle, taskDetailKey);
+        }
+        closeTaskDetail();
+      });
+    }
+
+    if (taskDetailInstrToggle && taskDetailInstr && taskDetailSteps) {
+      taskDetailInstrToggle.addEventListener("click", function () {
+        taskDetailInstr.classList.add("task-detail__instr--open");
+        taskDetailInstrToggle.setAttribute("aria-expanded", "true");
+        taskDetailSteps.hidden = false;
+        taskDetailInstrToggle.hidden = true;
+      });
+    }
+
+    document.addEventListener(
+      "keydown",
+      function (e) {
+        if (e.key !== "Escape" || !taskDetailRoot || taskDetailRoot.hidden) return;
+        e.preventDefault();
+        closeTaskDetail();
+      },
+      true
+    );
   }
 
   function firstPaint() {
