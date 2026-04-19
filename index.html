@@ -13,7 +13,7 @@
     <div class="game">
       <div class="game__inner">
         <header class="game-hero" aria-label="Прогресс за неделю">
-          <!-- 2277:43684 — «лучи» sunburst, под пятнами 2277:43852 -->
+          <!-- 2277:43684 — лучи (y -30, h 345, x на img -4.608), под пятнами 2277:43852 -->
           <div class="game-hero__rays" aria-hidden="true">
             <img
               class="game-hero__rays-img"
@@ -79,23 +79,27 @@
             </button>
           </div>
           <div class="game-hero__text">
-            <h1 class="game-hero__h1">
-              Выполняйте
-              <br />
-              задания за баллы
-            </h1>
-            <div class="game-hero__points">
-              <img
-                class="game-hero__pt-ico"
-                src="assets/screen/points-plus.svg"
-                width="36"
-                height="36"
-                alt=""
-                decoding="async"
-              />
-              <span class="game-hero__pt-val" id="headerWeekProgress">0/375</span>
+            <h1 class="game-hero__title-sr">Выполняйте задания за баллы</h1>
+            <div class="game-hero__text-inner">
+              <div class="game-hero__week-block">
+                <div class="game-hero__week-row">
+                  <div class="game-hero__week-pill" role="status" aria-label="Прогресс за неделю по баллам">
+                    <span class="game-hero__week-val" id="headerWeekProgress">0/375</span>
+                    <div class="game-hero__week-ico" aria-hidden="true">
+                      <img
+                        class="game-hero__week-ico-img"
+                        src="assets/screen/week-progress-plus.svg"
+                        width="44"
+                        height="44"
+                        alt=""
+                        decoding="async"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <p class="game-hero__sub">получено на этой неделе</p>
+              </div>
             </div>
-            <p class="game-hero__sub">заработано на этой неделе</p>
           </div>
         </header>
         <div class="game-sheet">
