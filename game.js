@@ -1,3 +1,41 @@
+(function initGameHeaderScrolledState() {
+  "use strict";
+  const inner = document.querySelector(".game__inner");
+  const header = document.querySelector(".game-header");
+  const sentinel = document.querySelector(".game-header-scroll-sentinel");
+  if (!inner || !header || !sentinel) return;
+
+  function setScrolled(scrolled) {
+    header.classList.toggle("game-header--scrolled", scrolled);
+  }
+
+  if (typeof IntersectionObserver !== "undefined") {
+    const headerOffset = parseInt(
+      String(getComputedStyle(inner).getPropertyValue("--game-header-offset") || "64").trim(),
+      10
+    ) || 64;
+    /* Исключаем зону липкой шапки: иначе сентинел «пересекает» root, будучи под шапкой, и класс не включается */
+    const topInset = `-${headerOffset}px`;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (!entry) return;
+        /* Пока сентинел попадает в область под шапкой — верх; иначе — скроллили */
+        setScrolled(!entry.isIntersecting);
+      },
+      { root: inner, rootMargin: `${topInset} 0px 0px 0px`, threshold: 0 }
+    );
+    io.observe(sentinel);
+  } else {
+    const THRESHOLD = 2;
+    function sync() {
+      setScrolled(inner.scrollTop > THRESHOLD);
+    }
+    inner.addEventListener("scroll", sync, { passive: true });
+    sync();
+  }
+})();
+
 (function () {
   "use strict";
 

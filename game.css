@@ -26,6 +26,8 @@
 }
 
 .game__inner {
+  /* Высота ряда шапки (py 20 + контент ~24) — стык с .game-hero при отрицательном margin */
+  --game-header-offset: 64px;
   flex: 1 1 auto;
   min-height: 0;
   max-width: 375px;
@@ -43,8 +45,10 @@
 .game-hero {
   position: relative;
   background: #0853f8;
-  /* 2277:43683 — верх 24px (Сurtain); низ без скругления */
-  border-radius: 24px 24px 0 0;
+  /* Шапка вынесена в .game-header — без скругления у шапки */
+  border-radius: 0;
+  margin-top: calc(-1 * var(--game-header-offset, 64px));
+  padding-top: var(--game-header-offset, 64px);
   /* пятна из макета (2277:43852) вылезают вверх — нельзя overflow: hidden */
   overflow: visible;
   z-index: 0;
@@ -171,39 +175,117 @@
   pointer-events: none;
 }
 
+/* Маркер под шапкой: когда уезжает из вьюпорта скролла — включаем .game-header--scrolled (см. game.js) */
+.game-header-scroll-sentinel {
+  flex-shrink: 0;
+  width: 100%;
+  height: 2px;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
 .game-header {
-  position: relative;
-  z-index: 2;
+  /* 4082:30374 — до скролла прозрачная; после — размытие контента под шапкой (frosted glass) */
+  --icons-secondary: #878787;
+  position: sticky;
+  top: 0;
+  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   /* 2314:16558: py 20, px 16 */
   padding: 20px 16px;
+  background: transparent;
+  transition:
+    background-color 0.22s ease,
+    box-shadow 0.22s ease,
+    -webkit-backdrop-filter 0.22s ease,
+    backdrop-filter 0.22s ease;
+}
+
+.game-header--scrolled {
+  /* Полупрозрачная плёнка + blur контента сзади (без сплошного #fff) */
+  background: rgba(255, 255, 255, 0.58);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  backdrop-filter: blur(18px) saturate(1.35);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .game-header--scrolled {
+    background: rgba(255, 255, 255, 0.92);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 .game-header__ico {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 24px;
   height: 24px;
-  display: block;
+  min-width: 24px;
+  min-height: 24px;
   border: 0;
   padding: 0;
   background: transparent;
   cursor: pointer;
   flex-shrink: 0;
-  line-height: 0;
   opacity: 0.95;
   transition: opacity 0.12s ease;
+}
+
+/* Два слоя img (белый / secondary) — без CSS-mask, чтобы иконки не схлопывались в части браузеров */
+.game-header__ico-stack {
+  position: relative;
+  display: block;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
 }
 
 .game-header__ico-img {
   display: block;
   width: 24px;
   height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+}
+
+.game-header__ico-img--dark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+.game-header__ico-img--light {
+  transition: opacity 0.22s ease;
+}
+
+.game-header--scrolled .game-header__ico-img--light {
+  opacity: 0;
+}
+
+.game-header--scrolled .game-header__ico-img--dark {
+  opacity: 1;
 }
 
 .game-header__ico:hover {
   opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-header,
+  .game-header__ico-img--dark,
+  .game-header__ico-img--light {
+    transition: none;
+  }
 }
 
 .game-balance {
