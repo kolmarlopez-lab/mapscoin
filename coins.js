@@ -53,7 +53,7 @@
     var n = Math.floor(reward);
     if (n <= 0) return 0;
     if (prefersReducedMotion()) {
-      return Math.min(CONFIG.particlesReduced, n > 0 ? CONFIG.particlesReduced : 0);
+      return CONFIG.particlesReduced;
     }
     var visual = Math.max(4, Math.round(n / 7));
     return Math.min(CONFIG.maxParticles, visual);

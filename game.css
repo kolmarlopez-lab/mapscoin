@@ -1,8 +1,22 @@
+/* Обёртка экрана: центрирование 375px; высота = окно, иначе блок растёт по контенту и .game__inner не скроллится */
+.screen-game {
+  width: 100%;
+  max-width: 375px;
+  margin: 0 auto;
+  height: 100%;
+  max-height: 100dvh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
 /* Экран «штора» 2277:43683, max-w как в макете 375 — вьюпорт фиксирован, скролл внутри */
 .game {
+  flex: 1 1 auto;
+  min-height: 0;
   height: 100%;
   max-height: 100%;
-  min-height: 0;
   background: #0a0c10;
   padding: 0;
   display: flex;
@@ -39,6 +53,18 @@
   font-variant-numeric: lining-nums proportional-nums;
   /* tnum 0 — иначе шрифт держит моноширинные (tabular) цифры; pnum 1 + tnum 0 = proportional */
   font-feature-settings: "tnum" 0, "pnum" 1, "lnum" 1, "onum" 0, "case" 1;
+}
+
+/* Лучи + пятна: слой на всю область hero (иначе обрезка у короткого блока без текста) */
+.game-hero__decor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: visible;
 }
 
 /* Бейдж баланса: YS Text Medium, макет 2314:16558 — 'lnum' 1, 'pnum' 1 (без tnum/case) */
@@ -82,7 +108,8 @@
   width: calc(100% + 4.608px);
   height: auto;
   max-width: none;
-  /* без object-fit — в iOS Safari он для SVG кривит; верх 345px режет overflow родителя */
+  aspect-ratio: 379.609 / 499;
+  /* без object-fit — в iOS Safari он для SVG кривит; верх 345px режет overflow .game-hero__rays */
   pointer-events: none;
 }
 

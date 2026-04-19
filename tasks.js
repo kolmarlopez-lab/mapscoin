@@ -64,8 +64,7 @@
   function isWeeklyDepDone(key) {
     var st = S[key];
     if (!st) return false;
-    if (isExtraTask(key) || key === "bonus") return st.s === "claimed";
-    if (isMultiTask(key)) return st.s === "claimed";
+    if (isExtraTask(key) || key === "bonus" || isMultiTask(key)) return st.s === "claimed";
     return false;
   }
 
@@ -121,7 +120,7 @@
 
   function applyArticleState(art, key, state) {
     var a = "award-card award-card--task-cursor\n";
-      if (state === "ready") {
+    if (state === "ready") {
       /* С кнопкой «Получить» серый фон; зелёная компактная карточка только во «Выполненных» */
       if (
         isMultiTask(key) ||
@@ -497,27 +496,24 @@
 
   function bind() {
     panelAv.addEventListener("click", function (e) {
+      var claimBtn = e.target.closest(".js-task-claim");
+      if (claimBtn) {
+        e.preventDefault();
+        var artClaim = e.target.closest("article[data-task]");
+        if (!artClaim) return;
+        claim(artClaim, artClaim.getAttribute("data-task"));
+        return;
+      }
       if (e.target.closest(".award-card__link")) return;
-      if (e.target.closest(".js-task-claim")) return;
       var p = e.target.closest("article[data-task]");
       if (!p) return;
       if (e.target.closest(".task-fragment--ready")) return;
       var k = p.getAttribute("data-task");
       if (!S[k] || S[k].s !== "active") return;
       if (k === "spotlight") return;
-      else if (isMultiTask(k)) onAdvanceMulti(p, k);
+      if (isMultiTask(k)) onAdvanceMulti(p, k);
       else if (k === "bonus") onAdvanceBonus(p);
       else if (isExtraTask(k)) onAdvanceExtra(p, k);
-    });
-
-    panelAv.addEventListener("click", function (e) {
-      var btn = e.target.closest(".js-task-claim");
-      if (!btn) return;
-      e.preventDefault();
-      var p = e.target.closest("article[data-task]");
-      if (!p) return;
-      var k = p.getAttribute("data-task");
-      claim(p, k);
     });
   }
 
@@ -542,6 +538,24 @@
     updateDoneEmpty();
   }
 
+  window.addEventListener(
+    "game-visible",
+    function () {
+      var mi;
+      for (mi = 0; mi < MULTI_TASK_KEYS.length; mi++) {
+        var mk = MULTI_TASK_KEYS[mi];
+        var mel = document.querySelector('article[data-task="' + mk + '"]');
+        if (mel) renderMulti(mel, mk, false);
+      }
+    },
+    { passive: true }
+  );
+
   bind();
   firstPaint();
+  window.requestAnimationFrame(function () {
+    window.requestAnimationFrame(function () {
+      window.dispatchEvent(new CustomEvent("game-visible"));
+    });
+  });
 })();
