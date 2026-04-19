@@ -127,6 +127,22 @@
     return !!(el.closest(".game-header-basic") || el.closest(".game-header-new"));
   }
 
+  /** Иначе setPointerCapture(main) забирает указатель — кнопки «Получить» и др. не получают click */
+  function isInteractiveTarget(el) {
+    if (!el || !el.closest) return false;
+    if (el.closest("button, a[href], input, select, textarea, label, [role='button'], [contenteditable='true']")) {
+      return true;
+    }
+    if (
+      el.closest(
+        ".js-task-claim, .js-award-claim, .award-card__link, .daily-cta, .task-tabs__tab, [data-task]"
+      )
+    ) {
+      return true;
+    }
+    return false;
+  }
+
   function applyPull(clientY) {
     if (scrollEl.scrollTop > 2) {
       endGesture();
@@ -152,6 +168,7 @@
     if (scrollEl.scrollTop > 1) return;
     if (!inScrollViewport(e.clientX, e.clientY)) return;
     if (isHeaderChrome(e.target)) return;
+    if (isInteractiveTarget(e.target)) return;
     startY = e.clientY;
     gesture = true;
     didStretch = false;
@@ -187,6 +204,7 @@
     var t = e.touches[0];
     if (!inScrollViewport(t.clientX, t.clientY)) return;
     if (isHeaderChrome(e.target)) return;
+    if (isInteractiveTarget(e.target)) return;
     startY = t.clientY;
     gesture = true;
     didStretch = false;
