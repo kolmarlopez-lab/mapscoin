@@ -43,8 +43,8 @@
 .game-hero {
   position: relative;
   background: #0853f8;
-  /* Верх 20px; низ без скругления — иначе на стыке с .game-sheet видны «рожки» тёмного фона */
-  border-radius: 20px 20px 0 0;
+  /* 2277:43683 — верх 24px (Сurtain); низ без скругления */
+  border-radius: 24px 24px 0 0;
   /* пятна из макета (2277:43852) вылезают вверх — нельзя overflow: hidden */
   overflow: visible;
   z-index: 0;
@@ -84,32 +84,30 @@
   max-width: 100%;
 }
 
-/* 2277:43684 — y -30, h 345; img с src из HTML — путь вне game.css, деплой на /repo/ не ломает лучи */
+/* 2277:43684 Rays — макет: w375 × h251, top 0, left calc(50% + 0.5px) + translateX(-50%) */
 .game-hero__rays {
   position: absolute;
-  left: 0;
-  right: 0;
-  top: -30px;
-  width: 100%;
-  height: 345px;
-  z-index: 0;
+  left: calc(50% + 0.5px);
+  transform: translateX(-50%);
+  top: 0;
+  width: min(375px, 100%);
+  height: 251px;
   pointer-events: none;
   overflow: hidden;
   opacity: 0.99;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+  z-index: 1;
 }
 
 .game-hero__rays-img {
   position: absolute;
-  left: -4.608px;
-  top: 0;
+  inset: 0;
   display: block;
-  width: calc(100% + 4.608px);
-  height: auto;
+  width: 100%;
+  height: 100%;
   max-width: none;
-  aspect-ratio: 379.609 / 499;
-  /* без object-fit — в iOS Safari он для SVG кривит; верх 345px режет overflow .game-hero__rays */
+  /* SVG в макете с fill по фрейму (preserveAspectRatio none в ассете) */
   pointer-events: none;
 }
 
