@@ -35,6 +35,129 @@
   });
 })();
 
+(function initGameHeroRaysPullStretch() {
+  "use strict";
+  var scrollEl = document.querySelector(".game-scroll");
+  var main = document.querySelector(".game-main");
+  var hero = document.querySelector(".game-hero");
+  var rays = document.querySelector(".game-hero__rays");
+  if (!scrollEl || !main || !rays) return;
+
+  var reduced = false;
+  try {
+    reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  } catch (e) {
+    void e;
+  }
+
+  /* Растяжение лучей пропорционально «натягу» листа: смещение пальца линейно к scale, опорная величина — высота героя.
+     Слушатели на .game-main в capture: у .game-sheet pointer-events: none — касания часто не бьют в .game-scroll. */
+  var touchStartY = 0;
+  var gesture = false;
+  var didStretch = false;
+
+  /** Доля прироста масштаба, если сместить палец вниз на высоту героя (например 0.12 → +12% при pull = height). */
+  var stretchPerHeroHeight = 0.12;
+  var maxScaleDelta = 0.22;
+
+  function heroHeightPx() {
+    var h = hero ? hero.getBoundingClientRect().height : 0;
+    return h > 48 ? h : 320;
+  }
+
+  function scaleForPull(pullPx) {
+    if (pullPx <= 0) return 1;
+    var h = heroHeightPx();
+    var delta = (pullPx / h) * stretchPerHeroHeight;
+    if (delta > maxScaleDelta) delta = maxScaleDelta;
+    return 1 + delta;
+  }
+
+  function setRaysTransform(scale) {
+    rays.style.transform = "translateX(-50%) scale(" + scale + ")";
+  }
+
+  function endGesture() {
+    gesture = false;
+    if (reduced) return;
+    rays.classList.remove("game-hero__rays--pulling");
+    if (didStretch) {
+      didStretch = false;
+      setRaysTransform(1);
+    } else {
+      rays.style.transform = "";
+    }
+  }
+
+  function inScrollViewport(clientX, clientY) {
+    var r = scrollEl.getBoundingClientRect();
+    return clientX >= r.left && clientX <= r.right && clientY >= r.top && clientY <= r.bottom;
+  }
+
+  function isHeaderChrome(el) {
+    if (!el || !el.closest) return false;
+    return !!(el.closest(".game-header-basic") || el.closest(".game-header-new"));
+  }
+
+  function onTouchStart(e) {
+    if (reduced) return;
+    if (scrollEl.scrollTop > 1) return;
+    if (!e.touches || !e.touches.length) return;
+    var t = e.touches[0];
+    if (!inScrollViewport(t.clientX, t.clientY)) return;
+    if (isHeaderChrome(e.target)) return;
+    touchStartY = t.clientY;
+    gesture = true;
+    didStretch = false;
+  }
+
+  function onTouchMove(e) {
+    if (reduced || !gesture) return;
+    if (!e.touches || !e.touches.length) return;
+    var t = e.touches[0];
+    if (!inScrollViewport(t.clientX, t.clientY)) {
+      endGesture();
+      return;
+    }
+    if (scrollEl.scrollTop > 2) {
+      endGesture();
+      return;
+    }
+    var pull = t.clientY - touchStartY;
+    if (pull > 0) {
+      didStretch = true;
+      rays.classList.add("game-hero__rays--pulling");
+      setRaysTransform(scaleForPull(pull));
+    } else if (didStretch) {
+      rays.classList.remove("game-hero__rays--pulling");
+      setRaysTransform(1);
+    }
+  }
+
+  function onTouchEnd() {
+    if (!gesture) return;
+    endGesture();
+  }
+
+  main.addEventListener("touchstart", onTouchStart, { capture: true, passive: true });
+  main.addEventListener("touchmove", onTouchMove, { capture: true, passive: true });
+  main.addEventListener("touchend", onTouchEnd, { capture: true, passive: true });
+  main.addEventListener("touchcancel", onTouchEnd, { capture: true, passive: true });
+
+  scrollEl.addEventListener(
+    "scroll",
+    function () {
+      if (scrollEl.scrollTop > 2) {
+        rays.classList.remove("game-hero__rays--pulling");
+        rays.style.transform = "";
+        gesture = false;
+        didStretch = false;
+      }
+    },
+    { passive: true }
+  );
+})();
+
 (function initGameHeaderScrolledState() {
   "use strict";
   const scrollEl = document.querySelector(".game-scroll");
