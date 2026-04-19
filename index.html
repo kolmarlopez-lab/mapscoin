@@ -91,7 +91,7 @@
               <div class="game-hero__week-block">
                 <div class="game-hero__week-row">
                   <div class="game-hero__week-pill" role="status" aria-label="Прогресс за неделю по баллам">
-                    <span class="game-hero__week-val" id="headerWeekProgress">0/375</span>
+                    <span class="game-hero__week-val js-header-week-value" id="headerWeekProgress">0/375</span>
                     <div class="game-hero__week-ico" aria-hidden="true">
                       <img
                         class="game-hero__week-ico-img"
@@ -711,13 +711,17 @@
               </span>
             </button>
             <div class="game-balance">
-              <div class="game-balance__pill" role="status" aria-label="Баланс баллов">
+              <div
+                class="game-balance__pill game-header-new__week-pill"
+                role="status"
+                aria-label="Прогресс за неделю по баллам"
+              >
                 <div class="game-balance__row">
-                  <span class="game-balance__value js-header-balance-value">1800</span>
+                  <span class="game-balance__value js-header-week-value">0/375</span>
                   <div class="game-balance__ico-box" aria-hidden="true">
                     <img
                       class="game-balance__ico"
-                      src="assets/screen/balance-plus-glyph.svg"
+                      src="assets/screen/week-progress-plus.svg"
                       alt=""
                       decoding="async"
                     />

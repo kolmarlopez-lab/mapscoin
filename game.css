@@ -71,17 +71,18 @@
   /* Прозрачная зона = герой; + offset — расстояние от верха расширенного скролла до низа героя */
   --game-scroll-pad: calc(var(--game-hero-h) + var(--game-header-offset, 64px));
   padding-top: var(--game-scroll-pad);
-  padding-bottom: 32px;
+  padding-bottom: 0;
   padding-left: 0;
   padding-right: 0;
   box-sizing: border-box;
-  /* Без background-color: иначе «transparent» в градиенте ляжет на этот слой и перекроет герой с лучами (z ниже .game-scroll). */
-  /* Ниже зоны героя — белый фон (в т.ч. под padding-bottom), иначе просвечивает синий .game-main */
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  /* Верх без заливки — герой с лучами. Снизу полоса белого градиента: иначе при оверскролле снизу просвечивает синий .game-main (полоска). Контент .game-sheet рисуется поверх фона. */
   background-image: linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent var(--game-scroll-pad),
-    #fff var(--game-scroll-pad)
+    to top,
+    #ffffff 0,
+    rgba(255, 255, 255, 0) min(200px, 40vh)
   );
   pointer-events: auto;
 }
@@ -139,9 +140,7 @@
 .game-hero__rays {
   position: absolute;
   left: calc(50% + 0.5px);
-  transform: translateX(-50%) scale(1);
-  transform-origin: 50% 0;
-  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateX(-50%);
   top: 0;
   width: min(375px, 100%);
   height: 251px;
@@ -153,9 +152,9 @@
   z-index: 1;
 }
 
-/* Пока тянем лист вниз от верха — масштаб задаётся из game.js, без анимации «в ответ на палец» */
+/* Пока тянем лист — растягивается сама картинка лучей (game.js), не контейнер */
 .game-hero__rays.game-hero__rays--pulling {
-  transition: none;
+  overflow: visible;
 }
 
 .game-hero__rays-img {
@@ -165,8 +164,14 @@
   width: 100%;
   height: 100%;
   max-width: none;
+  transform-origin: 50% 0;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   /* SVG в макете с fill по фрейму (preserveAspectRatio none в ассете) */
   pointer-events: none;
+}
+
+.game-hero__rays.game-hero__rays--pulling .game-hero__rays-img {
+  transition: none;
 }
 
 /* Figma: два эллипса 278×285, rotate 90° + увеличенный кроп (inset) */
@@ -307,6 +312,37 @@
 .game-header-new__row > .game-balance {
   position: relative;
   z-index: 1;
+}
+
+/* Figma 2402:45799 Tag — белый фон, border separator #ebebeb (Геймцентр) */
+.game-header-new .game-balance__pill.game-header-new__week-pill {
+  border: 1px solid #ebebeb;
+  background: #fff;
+  box-shadow: none;
+  padding: 4px 4px 4px 6px;
+}
+
+.game-header-new .game-header-new__week-pill .game-balance__row {
+  gap: 2px;
+  padding: 0;
+  min-width: 0;
+}
+
+.game-header-new .game-header-new__week-pill .game-balance__value {
+  color: #000;
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: 500;
+}
+
+.game-header-new .game-header-new__week-pill .game-balance__ico-box {
+  width: 16px;
+  height: 16px;
+}
+
+.game-header-new .game-header-new__week-pill .game-balance__ico {
+  width: 14px;
+  height: 14px;
 }
 
 .game-header__ico {
@@ -612,7 +648,9 @@
   border-radius: 20px 20px 0 0;
   /* Только «вверх» к герою: полное 0 0 4px давало серую линию снизу листа на белом padding скролла */
   box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.06);
-  padding: 8px 0 8px;
+  /* Растягиваем лист до низа вьюпорта скролла, если контента мало; нижний отступ был в .game-scroll — перенесён сюда */
+  flex: 1 0 auto;
+  padding: 8px 0 max(32px, env(safe-area-inset-bottom, 0px));
   overflow: visible;
   pointer-events: none;
 }

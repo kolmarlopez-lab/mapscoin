@@ -41,7 +41,8 @@
   var main = document.querySelector(".game-main");
   var hero = document.querySelector(".game-hero");
   var rays = document.querySelector(".game-hero__rays");
-  if (!scrollEl || !main || !rays) return;
+  var raysImg = document.querySelector(".game-hero__rays-img");
+  if (!scrollEl || !main || !rays || !raysImg) return;
 
   var reduced = false;
   try {
@@ -50,48 +51,75 @@
     void e;
   }
 
-  /* Растяжение лучей пропорционально «натягу» листа: смещение пальца линейно к scale, опорная величина — высота героя.
-     Слушатели на .game-main в capture: у .game-sheet pointer-events: none — касания часто не бьют в .game-scroll. */
-  var touchStartY = 0;
+  /* Растягивание .game-hero__rays-img: scale(sx,sy). Pointer Events — тач + мышь; только touch на десктопе не срабатывает.
+     capture + setPointerCapture — жест не теряется из‑за pointer-events у листа. */
+  var startY = 0;
   var gesture = false;
   var didStretch = false;
+  var activePointerId = -1;
+  var hasPointer = typeof window.PointerEvent !== "undefined";
 
-  /** Доля прироста масштаба, если сместить палец вниз на высоту героя (например 0.12 → +12% при pull = height). */
-  var stretchPerHeroHeight = 0.12;
-  var maxScaleDelta = 0.22;
+  var stretchPerHeroHeight = 0.22;
+  var maxStretchDelta = 0.42;
+  var stretchYFactor = 1;
+  var stretchXFactor = 0.38;
 
   function heroHeightPx() {
     var h = hero ? hero.getBoundingClientRect().height : 0;
     return h > 48 ? h : 320;
   }
 
-  function scaleForPull(pullPx) {
-    if (pullPx <= 0) return 1;
+  function stretchForPull(pullPx) {
+    if (pullPx <= 0) return { sx: 1, sy: 1 };
     var h = heroHeightPx();
     var delta = (pullPx / h) * stretchPerHeroHeight;
-    if (delta > maxScaleDelta) delta = maxScaleDelta;
-    return 1 + delta;
+    if (delta > maxStretchDelta) delta = maxStretchDelta;
+    return {
+      sx: 1 + delta * stretchXFactor,
+      sy: 1 + delta * stretchYFactor,
+    };
   }
 
-  function setRaysTransform(scale) {
-    rays.style.transform = "translateX(-50%) scale(" + scale + ")";
+  function setRaysImgTransform(sx, sy) {
+    raysImg.style.transform = "scale(" + sx + ", " + sy + ")";
+  }
+
+  function releaseActivePointer() {
+    if (activePointerId >= 0 && hasPointer && typeof main.releasePointerCapture === "function") {
+      try {
+        if (typeof main.hasPointerCapture === "function" && main.hasPointerCapture(activePointerId)) {
+          main.releasePointerCapture(activePointerId);
+        }
+      } catch (err) {
+        void err;
+      }
+    }
+    activePointerId = -1;
   }
 
   function endGesture() {
     gesture = false;
+    releaseActivePointer();
     if (reduced) return;
     rays.classList.remove("game-hero__rays--pulling");
+    raysImg.style.willChange = "";
     if (didStretch) {
       didStretch = false;
-      setRaysTransform(1);
+      setRaysImgTransform(1, 1);
     } else {
-      rays.style.transform = "";
+      raysImg.style.transform = "";
     }
   }
 
   function inScrollViewport(clientX, clientY) {
     var r = scrollEl.getBoundingClientRect();
-    return clientX >= r.left && clientX <= r.right && clientY >= r.top && clientY <= r.bottom;
+    var pad = 24;
+    return (
+      clientX >= r.left - pad &&
+      clientX <= r.right + pad &&
+      clientY >= r.top - pad &&
+      clientY <= r.bottom + pad
+    );
   }
 
   function isHeaderChrome(el) {
@@ -99,59 +127,106 @@
     return !!(el.closest(".game-header-basic") || el.closest(".game-header-new"));
   }
 
+  function applyPull(clientY) {
+    if (scrollEl.scrollTop > 2) {
+      endGesture();
+      return;
+    }
+    var pull = clientY - startY;
+    if (pull > 0) {
+      didStretch = true;
+      rays.classList.add("game-hero__rays--pulling");
+      raysImg.style.willChange = "transform";
+      var st = stretchForPull(pull);
+      setRaysImgTransform(st.sx, st.sy);
+    } else if (didStretch) {
+      rays.classList.remove("game-hero__rays--pulling");
+      setRaysImgTransform(1, 1);
+    }
+  }
+
+  function onPointerDown(e) {
+    if (reduced) return;
+    if (!e.isPrimary) return;
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    if (scrollEl.scrollTop > 1) return;
+    if (!inScrollViewport(e.clientX, e.clientY)) return;
+    if (isHeaderChrome(e.target)) return;
+    startY = e.clientY;
+    gesture = true;
+    didStretch = false;
+    activePointerId = e.pointerId;
+    try {
+      main.setPointerCapture(e.pointerId);
+    } catch (err) {
+      void err;
+    }
+  }
+
+  function onPointerMove(e) {
+    if (!gesture || !hasPointer) return;
+    if (e.pointerId !== activePointerId) return;
+    if (e.pointerType === "mouse" && (e.buttons & 1) === 0) {
+      endGesture();
+      return;
+    }
+    applyPull(e.clientY);
+  }
+
+  function onPointerUp(e) {
+    if (!hasPointer) return;
+    if (e.pointerId !== activePointerId) return;
+    endGesture();
+  }
+
   function onTouchStart(e) {
+    if (hasPointer) return;
     if (reduced) return;
     if (scrollEl.scrollTop > 1) return;
     if (!e.touches || !e.touches.length) return;
     var t = e.touches[0];
     if (!inScrollViewport(t.clientX, t.clientY)) return;
     if (isHeaderChrome(e.target)) return;
-    touchStartY = t.clientY;
+    startY = t.clientY;
     gesture = true;
     didStretch = false;
   }
 
   function onTouchMove(e) {
+    if (hasPointer) return;
     if (reduced || !gesture) return;
     if (!e.touches || !e.touches.length) return;
-    var t = e.touches[0];
-    if (!inScrollViewport(t.clientX, t.clientY)) {
-      endGesture();
-      return;
-    }
-    if (scrollEl.scrollTop > 2) {
-      endGesture();
-      return;
-    }
-    var pull = t.clientY - touchStartY;
-    if (pull > 0) {
-      didStretch = true;
-      rays.classList.add("game-hero__rays--pulling");
-      setRaysTransform(scaleForPull(pull));
-    } else if (didStretch) {
-      rays.classList.remove("game-hero__rays--pulling");
-      setRaysTransform(1);
-    }
+    applyPull(e.touches[0].clientY);
   }
 
   function onTouchEnd() {
+    if (hasPointer) return;
     if (!gesture) return;
     endGesture();
   }
 
-  main.addEventListener("touchstart", onTouchStart, { capture: true, passive: true });
-  main.addEventListener("touchmove", onTouchMove, { capture: true, passive: true });
-  main.addEventListener("touchend", onTouchEnd, { capture: true, passive: true });
-  main.addEventListener("touchcancel", onTouchEnd, { capture: true, passive: true });
+  if (hasPointer) {
+    main.addEventListener("pointerdown", onPointerDown, { capture: true });
+    main.addEventListener("pointermove", onPointerMove, { capture: true });
+    main.addEventListener("pointerup", onPointerUp, { capture: true });
+    main.addEventListener("pointercancel", onPointerUp, { capture: true });
+  } else {
+    main.addEventListener("touchstart", onTouchStart, { capture: true, passive: true });
+    main.addEventListener("touchmove", onTouchMove, { capture: true, passive: true });
+    main.addEventListener("touchend", onTouchEnd, { capture: true, passive: true });
+    main.addEventListener("touchcancel", onTouchEnd, { capture: true, passive: true });
+  }
 
   scrollEl.addEventListener(
     "scroll",
     function () {
       if (scrollEl.scrollTop > 2) {
         rays.classList.remove("game-hero__rays--pulling");
-        rays.style.transform = "";
+        raysImg.style.transform = "";
+        raysImg.style.willChange = "";
         gesture = false;
         didStretch = false;
+        releaseActivePointer();
       }
     },
     { passive: true }

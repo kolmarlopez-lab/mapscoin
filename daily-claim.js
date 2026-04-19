@@ -26,7 +26,6 @@
   const mark = document.getElementById("dailyCellTodayMark");
   const streakHint = document.getElementById("dailyStreakHint");
   const balanceVal = document.querySelector(".js-header-balance-value");
-  const weekVal = document.getElementById("headerWeekProgress");
   const weekPill = document.querySelector(".game-hero__week-pill");
 
   function prefersReducedMotion() {
@@ -87,12 +86,19 @@
     localStorage.setItem(WEEK_EARNED_KEY, String(n));
   }
 
+  function setHeaderWeekText(s) {
+    document.querySelectorAll(".js-header-week-value").forEach(function (el) {
+      el.textContent = s;
+    });
+  }
+
   function parseWeekParts() {
     const fallbackMax = getWeekMaxPoints();
-    if (!weekVal) {
+    const weekEl = document.querySelector(".js-header-week-value");
+    if (!weekEl) {
       return { earned: 0, max: fallbackMax };
     }
-    const m = String(weekVal.textContent).match(/^\s*(\d+)\s*\/\s*(\d+)\s*$/);
+    const m = String(weekEl.textContent).match(/^\s*(\d+)\s*\/\s*(\d+)\s*$/);
     if (!m) {
       return { earned: 0, max: fallbackMax };
     }
@@ -125,11 +131,11 @@
   }
 
   function initWeekProgress() {
-    if (!weekVal) return;
+    if (!document.querySelector(".js-header-week-value")) return;
     const max = getWeekMaxPoints();
     const w = getSavedWeekEarned();
     const earned = w == null ? 0 : Math.min(Math.max(0, w), max);
-    weekVal.textContent = String(earned) + "/" + String(max);
+    setHeaderWeekText(String(earned) + "/" + String(max));
   }
 
   var dailyLayoutResizeTimer = null;
@@ -216,7 +222,7 @@
     setHeaderBalanceText(String(toB));
     setSavedBalance(toB);
 
-    if (!weekVal) {
+    if (!document.querySelector(".js-header-week-value")) {
       if (toW !== fromW) setSavedWeekEarned(toW);
       return;
     }
@@ -247,16 +253,12 @@
       const t = Math.min(1, (now - t0) / DUR);
       const eased = 1 - Math.pow(1 - t, 3);
       const wE = Math.round(fromW + (toW - fromW) * eased);
-      if (weekVal) {
-        weekVal.textContent = String(wE) + "/" + String(weekMax);
-      }
+      setHeaderWeekText(String(wE) + "/" + String(weekMax));
       if (t < 1) {
         requestAnimationFrame(step);
       } else {
-        if (weekVal) {
-          weekVal.textContent = String(toW) + "/" + String(weekMax);
-          setSavedWeekEarned(toW);
-        }
+        setHeaderWeekText(String(toW) + "/" + String(weekMax));
+        setSavedWeekEarned(toW);
         finishWeekPillBounce();
       }
     }
