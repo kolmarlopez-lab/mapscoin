@@ -407,7 +407,7 @@
   box-sizing: border-box;
 }
 
-/* 4082:31179: YS Text Bold 44, leading normal — выравнивание по центру с иконкой 44 */
+/* 4082:31179: YS Text Medium 44, leading normal — выравнивание по центру с иконкой 44 */
 .game-hero__week-val {
   display: inline-flex;
   align-items: center;
@@ -417,7 +417,7 @@
   font-family: "YS Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 44px;
   line-height: normal;
-  font-weight: 700;
+  font-weight: 500;
   font-style: normal;
   color: #000;
   font-synthesis: none;
