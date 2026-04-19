@@ -13,8 +13,17 @@
     <div class="game">
       <div class="game__inner">
         <header class="game-hero" aria-label="Прогресс за неделю">
-          <!-- 2277:43684 — лучи (y -30, h 345, x на img -4.608), под пятнами 2277:43852 -->
-          <div class="game-hero__rays" aria-hidden="true"></div>
+          <!-- 2277:43684 — лучи: src от корня страницы (в git/pages фон из game.css с относительным url часто 404) -->
+          <div class="game-hero__rays" aria-hidden="true">
+            <img
+              class="game-hero__rays-img"
+              src="assets/screen/hero-rays.svg"
+              alt=""
+              width="380"
+              height="499"
+              decoding="async"
+            />
+          </div>
           <!-- 2277:43852 — два мягких пятна (SVG из макета), под градиентом свечения -->
           <div class="game-hero__blob game-hero__blob--1" aria-hidden="true">
             <div class="game-hero__blob-rot">

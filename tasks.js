@@ -1,6 +1,14 @@
 (function () {
   "use strict";
 
+  try {
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
+  } catch (e) {
+    void e;
+  }
+
   const TIT =
     "Несколько раз в неделю открывайте карточки кофеен — любые точки на карте";
 
@@ -257,7 +265,7 @@
     setClaimFooterUi(art, "spotlight");
   }
 
-  function renderMulti(art, key) {
+  function renderMulti(art, key, skipProgressScroll) {
     var steps = MULTI_STEPS[key];
     var t = S[key];
     if (!steps || !t) return;
@@ -290,7 +298,8 @@
         }
       }
       pro.classList.toggle("award-card__progress--scroll", nSeg > 3);
-      if (nSeg > 3) {
+      /* Не крутим прогресс при первом paint — на мобильных сдвиг scrollLeft/раскладка двигают .game__inner вниз */
+      if (nSeg > 3 && !skipProgressScroll) {
         var segScroll = segs[hi];
         if (segScroll) {
           window.requestAnimationFrame(function () {
@@ -520,7 +529,7 @@
     for (mi = 0; mi < MULTI_TASK_KEYS.length; mi++) {
       var mk = MULTI_TASK_KEYS[mi];
       var mel = document.querySelector('article[data-task="' + mk + '"]');
-      if (mel) renderMulti(mel, mk);
+      if (mel) renderMulti(mel, mk, true);
     }
     if (c) renderBonus(c);
     var i;

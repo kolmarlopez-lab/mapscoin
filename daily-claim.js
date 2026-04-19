@@ -311,6 +311,11 @@
     });
   }
 
+  function resetGameInnerScrollTop() {
+    var inner = document.querySelector(".game__inner");
+    if (inner) inner.scrollTop = 0;
+  }
+
   initBalance();
   initWeekProgress();
   updateDailyStreakHint();
@@ -320,6 +325,28 @@
     function () {
       if (dailyLayoutResizeTimer) window.clearTimeout(dailyLayoutResizeTimer);
       dailyLayoutResizeTimer = window.setTimeout(updateDailyStripLayout, 120);
+    },
+    { passive: true }
+  );
+
+  /* После полной загрузки и восстановления скролла браузером — вернуть штору наверх (мобильные). */
+  window.addEventListener(
+    "load",
+    function () {
+      window.requestAnimationFrame(function () {
+        window.requestAnimationFrame(function () {
+          resetGameInnerScrollTop();
+          scheduleDailyStripLayout();
+        });
+      });
+    },
+    { passive: true }
+  );
+  window.addEventListener(
+    "pageshow",
+    function (ev) {
+      resetGameInnerScrollTop();
+      if (ev.persisted) scheduleDailyStripLayout();
     },
     { passive: true }
   );

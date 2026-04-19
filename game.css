@@ -58,7 +58,7 @@
   max-width: 100%;
 }
 
-/* 2277:43684 — y -30, h 345; фон вместо <img>: в iOS Safari object-fit+cover для SVG даёт неверный масштаб */
+/* 2277:43684 — y -30, h 345; img с src из HTML — путь вне game.css, деплой на /repo/ не ломает лучи */
 .game-hero__rays {
   position: absolute;
   left: 0;
@@ -70,14 +70,20 @@
   pointer-events: none;
   overflow: hidden;
   opacity: 0.99;
-  background-color: transparent;
-  background-image: url("assets/screen/hero-rays.svg");
-  background-repeat: no-repeat;
-  /* ширина как в макете 379.609 при ширине 375; высота по пропорции viewBox, верх 345px видим */
-  background-size: calc(100% + 4.608px) auto;
-  background-position: -4.608px 0;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+}
+
+.game-hero__rays-img {
+  position: absolute;
+  left: -4.608px;
+  top: 0;
+  display: block;
+  width: calc(100% + 4.608px);
+  height: auto;
+  max-width: none;
+  /* без object-fit — в iOS Safari он для SVG кривит; верх 345px режет overflow родителя */
+  pointer-events: none;
 }
 
 /* Figma: два эллипса 278×285, rotate 90° + увеличенный кроп (inset) */
