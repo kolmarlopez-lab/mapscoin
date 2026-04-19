@@ -44,10 +44,28 @@
     vibrate(16);
   }
 
+  /** Короткий отклик при нажатии на кнопку (до срабатывания click) */
+  function tap() {
+    if (!isMobileHapticContext()) return;
+    vibrate(10);
+  }
+
   if (typeof window === "undefined") return;
 
   window.gameHapticClaim = claim;
   window.gameHapticOpen = onOpen;
+  window.gameHapticTap = tap;
+
+  document.addEventListener(
+    "pointerdown",
+    function (e) {
+      if (e.button !== 0) return;
+      var el = e.target && e.target.closest && e.target.closest("button");
+      if (!el || el.disabled) return;
+      tap();
+    },
+    { passive: true, capture: true }
+  );
 
   window.addEventListener(
     "load",
