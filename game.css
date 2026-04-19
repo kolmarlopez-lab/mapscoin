@@ -188,7 +188,8 @@
 
 .game-header {
   /* 4082:30374 — до скролла прозрачная; после — размытие контента под шапкой (frosted glass) */
-  --icons-secondary: #878787;
+  /* Иконки шапки при скролле (поверх blur) */
+  --icons-secondary: #ccc;
   position: sticky;
   top: 0;
   z-index: 3;
