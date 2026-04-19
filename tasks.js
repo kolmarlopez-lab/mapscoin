@@ -151,6 +151,14 @@
     }
   }
 
+  /** Центрирует сегмент в горизонтальном .award-card__progress без scrollIntoView — на мобильных Safari он двигает весь скролл страницы. */
+  function scrollAwardProgressSegmentIntoView(pro, segEl) {
+    if (!pro || !segEl) return;
+    var pr = pro.getBoundingClientRect();
+    var sr = segEl.getBoundingClientRect();
+    pro.scrollLeft += sr.left - pr.left + sr.width / 2 - pr.width / 2;
+  }
+
   function claimFooterSelector(key) {
     if (isMultiTask(key)) return ".js-mile-claim-footer";
     if (key === "spotlight") return ".js-spot-claim-footer";
@@ -284,12 +292,10 @@
       pro.classList.toggle("award-card__progress--scroll", nSeg > 3);
       if (nSeg > 3) {
         var segScroll = segs[hi];
-        if (segScroll && segScroll.scrollIntoView) {
-          requestAnimationFrame(function () {
-            segScroll.scrollIntoView({
-              behavior: prefersReducedMotion() ? "auto" : "smooth",
-              inline: "center",
-              block: "nearest",
+        if (segScroll) {
+          window.requestAnimationFrame(function () {
+            window.requestAnimationFrame(function () {
+              scrollAwardProgressSegmentIntoView(pro, segScroll);
             });
           });
         }
